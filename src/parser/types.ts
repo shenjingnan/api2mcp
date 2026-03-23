@@ -58,11 +58,14 @@ export interface OpenApiSchema {
 export interface OpenApiRequestBody {
   description?: string;
   required?: boolean;
-  content: Record<string, {
-    schema?: OpenApiSchema;
-    example?: unknown;
-    examples?: Record<string, unknown>;
-  }>;
+  content: Record<
+    string,
+    {
+      schema?: OpenApiSchema;
+      example?: unknown;
+      examples?: Record<string, unknown>;
+    }
+  >;
 }
 
 /**
@@ -70,10 +73,13 @@ export interface OpenApiRequestBody {
  */
 export interface OpenApiResponse {
   description?: string;
-  content?: Record<string, {
-    schema?: OpenApiSchema;
-    example?: unknown;
-  }>;
+  content?: Record<
+    string,
+    {
+      schema?: OpenApiSchema;
+      example?: unknown;
+    }
+  >;
 }
 
 /**
@@ -117,11 +123,14 @@ export interface OpenApiInfo {
 export interface OpenApiServer {
   url: string;
   description?: string;
-  variables?: Record<string, {
-    default: string;
-    enum?: string[];
-    description?: string;
-  }>;
+  variables?: Record<
+    string,
+    {
+      default: string;
+      enum?: string[];
+      description?: string;
+    }
+  >;
 }
 
 /**

@@ -2,11 +2,11 @@
  * HTTP 客户端
  */
 
-import { buildRequest, appendQueryString } from './request-builder.js';
-import type { OpenApiOperation } from '../parser/types.js';
 import type { Config } from '../config/types.js';
+import type { OpenApiOperation } from '../parser/types.js';
 import { HttpError, ToolExecutionError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
+import { appendQueryString, buildRequest } from './request-builder.js';
 
 /**
  * HTTP 响应

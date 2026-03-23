@@ -28,7 +28,11 @@ export class OpenApiParseError extends Api2McpError {
 }
 
 export class ToolExecutionError extends Api2McpError {
-  constructor(message: string, public readonly toolName: string, cause?: Error) {
+  constructor(
+    message: string,
+    public readonly toolName: string,
+    cause?: Error
+  ) {
     super(message, 'TOOL_EXECUTION_ERROR', cause);
     this.name = 'ToolExecutionError';
   }

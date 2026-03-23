@@ -4,16 +4,16 @@
 
 import SwaggerParser from '@apidevtools/swagger-parser';
 import type { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import type {
-  ParsedOpenApiDoc,
-  OpenApiOperation,
-  OpenApiParameter,
-  OpenApiSchema,
-  OpenApiRequestBody,
-  ParameterLocation,
-} from './types.js';
 import { OpenApiParseError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
+import type {
+  OpenApiOperation,
+  OpenApiParameter,
+  OpenApiRequestBody,
+  OpenApiSchema,
+  ParameterLocation,
+  ParsedOpenApiDoc,
+} from './types.js';
 
 /**
  * 判断是否为 OpenAPI v3 文档
@@ -120,7 +120,10 @@ function extractOperations(doc: OpenAPIV3.Document): OpenApiOperation[] {
         tags: operation.tags,
         parameters: parameters.length > 0 ? parameters : undefined,
         requestBody: convertRequestBody(
-          operation.requestBody as OpenAPIV3.RequestBodyObject | OpenAPIV3.ReferenceObject | undefined
+          operation.requestBody as
+            | OpenAPIV3.RequestBodyObject
+            | OpenAPIV3.ReferenceObject
+            | undefined
         ),
         deprecated: operation.deprecated,
       };
@@ -171,7 +174,9 @@ export async function parseOpenApi(source: string): Promise<ParsedOpenApiDoc> {
       ? {
           schemas: api.components.schemas as Record<string, OpenApiSchema> | undefined,
           parameters: api.components.parameters as Record<string, OpenApiParameter> | undefined,
-          requestBodies: api.components.requestBodies as Record<string, OpenApiRequestBody> | undefined,
+          requestBodies: api.components.requestBodies as
+            | Record<string, OpenApiRequestBody>
+            | undefined,
         }
       : undefined;
 
@@ -219,9 +224,7 @@ export function getBaseUrl(doc: ParsedOpenApiDoc, overrideUrl?: string): string 
     return url;
   }
 
-  throw new OpenApiParseError(
-    'No base URL found in OpenAPI document. Please specify --base-url.'
-  );
+  throw new OpenApiParseError('No base URL found in OpenAPI document. Please specify --base-url.');
 }
 
 /**
