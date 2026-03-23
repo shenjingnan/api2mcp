@@ -5,8 +5,9 @@
  */
 
 import { Command } from 'commander';
-import { startServer } from './server/index.js';
 import { loadConfig } from './config/loader.js';
+import type { Config } from './config/types.js';
+import { startServer } from './server/index.js';
 import { ConfigurationError, OpenApiParseError } from './utils/error.js';
 import { logger } from './utils/logger.js';
 
@@ -23,7 +24,7 @@ program
   .option('-p, --prefix <prefix>', 'Tool name prefix')
   .option('-d, --debug', 'Enable debug mode', false)
   .action(async (options) => {
-    let config;
+    let config: Config | undefined;
     try {
       // 加载配置
       config = loadConfig({

@@ -3,11 +3,11 @@
  * 优先级: CLI 参数 > 环境变量 > 配置文件
  */
 
-import { existsSync, readFileSync } from 'fs';
-import { resolve } from 'path';
-import type { Config, CliArgs, EnvConfig, ConfigFile } from './types.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { ConfigurationError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
+import type { CliArgs, Config, ConfigFile, EnvConfig } from './types.js';
 
 const DEFAULT_TIMEOUT = 30000;
 const CONFIG_FILE_NAMES = ['api2mcp.json', 'api2mcp.config.json', '.api2mcp.json'];
@@ -47,7 +47,7 @@ function loadFromEnv(env: EnvConfig): Partial<Config> {
 
   if (env.API_TIMEOUT) {
     const timeout = parseInt(env.API_TIMEOUT, 10);
-    if (!isNaN(timeout) && timeout > 0) {
+    if (!Number.isNaN(timeout) && timeout > 0) {
       config.timeout = timeout;
     }
   }

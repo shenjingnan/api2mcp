@@ -53,7 +53,7 @@ export function convertSchema(
     return z.union([schemas[0], schemas[1] || schemas[0], ...schemas.slice(2)] as [
       z.ZodType,
       z.ZodType,
-      ...z.ZodType[]
+      ...z.ZodType[],
     ]);
   }
 
@@ -67,7 +67,7 @@ export function convertSchema(
     return z.union([schemas[0], schemas[1] || schemas[0], ...schemas.slice(2)] as [
       z.ZodType,
       z.ZodType,
-      ...z.ZodType[]
+      ...z.ZodType[],
     ]);
   }
 
@@ -192,13 +192,17 @@ function convertNumberSchema(schema: OpenApiSchema): z.ZodNumber {
   if (schema.exclusiveMinimum === true && schema.minimum !== undefined) {
     zodSchema = zodSchema.min(schema.minimum + (schema.type === 'integer' ? 1 : Number.MIN_VALUE));
   } else if (typeof schema.exclusiveMinimum === 'number') {
-    zodSchema = zodSchema.min(schema.exclusiveMinimum + (schema.type === 'integer' ? 1 : Number.MIN_VALUE));
+    zodSchema = zodSchema.min(
+      schema.exclusiveMinimum + (schema.type === 'integer' ? 1 : Number.MIN_VALUE)
+    );
   }
 
   if (schema.exclusiveMaximum === true && schema.maximum !== undefined) {
     zodSchema = zodSchema.max(schema.maximum - (schema.type === 'integer' ? 1 : Number.MIN_VALUE));
   } else if (typeof schema.exclusiveMaximum === 'number') {
-    zodSchema = zodSchema.max(schema.exclusiveMaximum - (schema.type === 'integer' ? 1 : Number.MIN_VALUE));
+    zodSchema = zodSchema.max(
+      schema.exclusiveMaximum - (schema.type === 'integer' ? 1 : Number.MIN_VALUE)
+    );
   }
 
   if (schema.enum) {
@@ -212,7 +216,10 @@ function convertNumberSchema(schema: OpenApiSchema): z.ZodNumber {
 /**
  * 转换数组 Schema
  */
-function convertArraySchema(schema: OpenApiSchema, refResolver: RefResolver): z.ZodArray<z.ZodType> {
+function convertArraySchema(
+  schema: OpenApiSchema,
+  refResolver: RefResolver
+): z.ZodArray<z.ZodType> {
   const itemSchema = schema.items ? convertSchema(schema.items, refResolver) : z.unknown();
 
   let zodSchema = z.array(itemSchema);

@@ -3,8 +3,8 @@
  */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { GeneratedTool } from '../converter/tool-generator.js';
 import type { Config } from '../config/types.js';
+import type { GeneratedTool } from '../converter/tool-generator.js';
 import { executeRequest, formatResponse } from '../executor/http-client.js';
 import { ToolExecutionError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';

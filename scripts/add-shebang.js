@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
-const cliPath = path.join(__dirname, '..', 'dist', 'cli.js');
+const _cliPath = path.join(__dirname, '..', 'dist', 'cli.js');
 const binPath = path.join(__dirname, '..', 'bin', 'api2mcp.js');
 
 // 确保 bin 目录存在

@@ -4,8 +4,8 @@
 
 import { z } from 'zod';
 import type { OpenApiOperation, OpenApiSchema } from '../parser/types.js';
-import { convertSchema, createRefResolver } from './schema-converter.js';
 import { logger } from '../utils/logger.js';
+import { convertSchema, createRefResolver } from './schema-converter.js';
 
 /**
  * 生成的工具定义
@@ -16,7 +16,7 @@ export interface GeneratedTool {
   /** 工具描述 */
   description: string;
   /** 输入参数 Schema */
-  inputSchema: z.ZodObject<any>;
+  inputSchema: z.ZodObject<z.ZodRawShape>;
   /** 原始操作定义 */
   operation: OpenApiOperation;
 }

@@ -104,7 +104,11 @@ export function buildRequest(
     }
   }
 
-  logger.debug(`Built request: ${operation.method} ${path}`, { query, headers, body: body ? '(body present)' : '(no body)' });
+  logger.debug(`Built request: ${operation.method} ${path}`, {
+    query,
+    headers,
+    body: body ? '(body present)' : '(no body)',
+  });
 
   return {
     path,

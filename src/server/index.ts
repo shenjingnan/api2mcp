@@ -5,10 +5,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import type { Config } from '../config/types.js';
-import { parseOpenApi, getBaseUrl } from '../parser/swagger.js';
 import { generateTools } from '../converter/tool-generator.js';
-import { ToolManager } from './tool-manager.js';
+import { getBaseUrl, parseOpenApi } from '../parser/swagger.js';
 import { logger } from '../utils/logger.js';
+import { ToolManager } from './tool-manager.js';
 
 /**
  * 创建并启动 MCP 服务器
