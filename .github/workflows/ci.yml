@@ -1,0 +1,85 @@
+name: CI
+
+permissions:
+  contents: read
+
+# 触发条件：只在PR到main分支时运行CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  # CI 阶段 - 完整的代码质量和测试检查
+  ci:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: ["24"]
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 启用 Corepack
+        run: corepack enable
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: 安装依赖
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_on: error
+          command: pnpm install --frozen-lockfile
+
+      # 代码质量检查
+      - name: 代码检查
+        run: pnpm run lint
+
+      # 构建
+      - name: 构建
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          retry_on: error
+          command: pnpm run build
+
+      - name: 类型检查
+        run: pnpm run typecheck
+
+      - name: 拼写检查
+        run: pnpm run spellcheck
+
+      # 测试
+      - name: 测试
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          retry_on: error
+          command: pnpm run test:coverage
+
+      # 上传覆盖率报告
+      - name: 上传覆盖率报告
+        uses: codecov/codecov-action@v5
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
