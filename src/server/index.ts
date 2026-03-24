@@ -25,17 +25,8 @@ export async function createServer(config: Config): Promise<McpServer> {
   // 解析 OpenAPI 文档
   const openApiDoc = await parseOpenApi(config.openapiUrl);
 
-  // 获取基础 URL
-  let baseUrl: string;
-  try {
-    baseUrl = getBaseUrl(openApiDoc, config.baseUrl);
-  } catch (error) {
-    if (config.baseUrl) {
-      baseUrl = config.baseUrl;
-    } else {
-      throw error;
-    }
-  }
+  // 获取基础 URL（可能为 undefined）
+  const baseUrl = getBaseUrl(openApiDoc, config.baseUrl);
 
   // 更新配置中的 baseUrl
   const effectiveConfig: Config = {

@@ -26,7 +26,15 @@ export async function executeRequest(
   input: Record<string, unknown>,
   config: Config
 ): Promise<HttpResponse> {
-  const baseUrl = config.baseUrl || '';
+  const baseUrl = config.baseUrl;
+
+  // 如果没有 base URL，提供友好的错误提示
+  if (!baseUrl) {
+    throw new ToolExecutionError(
+      'No base URL configured. Please specify --base-url when starting the server, or provide _baseUrl parameter when calling the tool.',
+      operation.operationId || operation.path
+    );
+  }
 
   try {
     // 构建请求
