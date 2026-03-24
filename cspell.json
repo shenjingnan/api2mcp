@@ -1,0 +1,28 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "api2mcp",
+    "shenjingnan",
+    "mcp",
+    "modelcontextprotocol",
+    "openapi",
+    "swagger",
+    "apidevtools",
+    "tsup",
+    "zod",
+    "commander",
+    "httpclient",
+    "unmarshal",
+    "petstore",
+    "myapi",
+    "APIV"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.lock",
+    "pnpm-lock.yaml"
+  ]
+}
