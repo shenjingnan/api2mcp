@@ -21,9 +21,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "release": "release-it",
-    "release:patch": "release-it patch",
-    "release:minor": "release-it minor",
-    "release:major": "release-it major"
+    "release:beta": "release-it --preRelease=beta --ci",
+    "release:patch": "release-it patch --ci",
+    "release:minor": "release-it minor --ci",
+    "release:major": "release-it major --ci"
   },
   "keywords": [
     "mcp",
