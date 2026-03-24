@@ -18,11 +18,5 @@
     "myapi",
     "APIV"
   ],
-  "ignorePaths": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "*.lock",
-    "pnpm-lock.yaml"
-  ]
+  "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
 }
