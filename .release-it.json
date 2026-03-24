@@ -1,37 +1,60 @@
 {
   "git": {
-    "commitMessage": "chore(release): v${version}",
-    "tag": false
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "push": true,
+    "pushArgs": ["--set-upstream", "--follow-tags"],
+    "pushRepo": "origin",
+    "commit": true,
+    "tag": false,
+    "requireCleanWorkingDir": false,
+    "requireBranch": false,
+    "requireUpstream": false
+  },
+  "prompt": {
+    "commit": false,
+    "tag": false,
+    "push": false,
+    "release": false
   },
   "npm": {
-    "publish": false
+    "publish": false,
+    "skipChecks": true
   },
   "github": {
     "release": false
   },
   "plugins": {
     "@release-it/conventional-changelog": {
-      "preset": {
-        "name": "conventionalcommits"
-      },
+      "preset": "angular",
       "infile": "CHANGELOG.md",
-      "header": "# Changelog\n\nAll notable changes to this project will be documented in this file.",
-      "types": [
-        { "type": "feat", "section": "Features" },
-        { "type": "fix", "section": "Bug Fixes" },
-        { "type": "perf", "section": "Performance Improvements" },
-        { "type": "refactor", "section": "Code Refactoring" },
-        { "type": "docs", "section": "Documentation" },
-        { "type": "test", "section": "Tests" },
-        { "type": "build", "section": "Build System" },
-        { "type": "ci", "section": "CI/CD" },
-        { "type": "chore", "hidden": true }
-      ]
+      "header": "# 更新日志\n\n本文档记录项目的所有重要变更。"
     }
   },
   "hooks": {
-    "before:init": ["pnpm run lint", "pnpm run test", "pnpm run build"],
-    "after:bump": "git checkout -b release/v${version}",
-    "after:release": "git push -u origin release/v${version} && gh pr create --title 'chore(release): v${version}' --body 'Automated release for version ${version}. Please review the changes and merge to trigger the release.' --base main"
+    "before:init": ["pnpm lint", "pnpm test", "pnpm build"],
+    "after:bump": ["echo '\n✓ 版本已更新至 ${version}'"],
+    "before:git:release": [
+      "pnpm lint:fix",
+      "git add -A",
+      "echo '✓ 代码格式已修复'",
+      "git checkout -b release/v${version} 2>/dev/null || git checkout release/v${version}",
+      "echo '✓ 已切换到发布分支: release/v${version}'"
+    ],
+    "after:git:release": [
+      "echo '\n✓ 发布提交已创建'",
+      "echo '✓ 正在推送到远程仓库...'",
+      "git push -u origin release/v${version}",
+      "echo '\n📝 正在创建 Pull Request...'",
+      "gh pr create --title 'chore: 发布 v${version}' --body '发布版本 ${version}\n\n## 变更内容\n详见 CHANGELOG.md。\n\n## 检查清单\n- [x] 版本已更新\n- [x] CHANGELOG 已更新\n- [x] 测试已通过' --base main --head release/v${version}",
+      "echo '\n✅ Pull Request 已创建！请审核并合并。'"
+    ],
+    "after:release": [
+      "echo '\n🎉 发布 PR 已创建！'",
+      "echo '合并后，GitHub Actions 将自动执行以下操作：'",
+      "echo '  1. 创建 git 标签'",
+      "echo '  2. 发布到 NPM'",
+      "echo '  3. 创建 GitHub Release'"
+    ]
   }
 }
