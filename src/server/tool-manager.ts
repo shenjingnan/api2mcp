@@ -78,7 +78,16 @@ export class ToolManager {
     try {
       logger.debug(`Executing tool: ${toolName}`, args);
 
-      const response = await executeRequest(tool.operation, args, this.config);
+      // 提取 _baseUrl 参数
+      const { _baseUrl, ...restArgs } = args;
+
+      // 创建临时配置，优先使用参数中的 _baseUrl
+      const executionConfig = {
+        ...this.config,
+        baseUrl: typeof _baseUrl === 'string' ? _baseUrl : this.config.baseUrl,
+      };
+
+      const response = await executeRequest(tool.operation, restArgs, executionConfig);
       const formattedResponse = formatResponse(response);
 
       return {

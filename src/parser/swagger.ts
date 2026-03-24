@@ -203,7 +203,7 @@ export async function parseOpenApi(source: string): Promise<ParsedOpenApiDoc> {
 /**
  * 获取基础 URL
  */
-export function getBaseUrl(doc: ParsedOpenApiDoc, overrideUrl?: string): string {
+export function getBaseUrl(doc: ParsedOpenApiDoc, overrideUrl?: string): string | undefined {
   if (overrideUrl) {
     logger.debug(`Using override base URL: ${overrideUrl}`);
     return overrideUrl;
@@ -224,7 +224,11 @@ export function getBaseUrl(doc: ParsedOpenApiDoc, overrideUrl?: string): string 
     return url;
   }
 
-  throw new OpenApiParseError('No base URL found in OpenAPI document. Please specify --base-url.');
+  // 不再抛出错误，返回 undefined 并打印警告
+  logger.warn(
+    'No base URL found in OpenAPI document. You may need to specify --base-url or provide _baseUrl when calling tools.'
+  );
+  return undefined;
 }
 
 /**

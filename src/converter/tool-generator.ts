@@ -146,6 +146,13 @@ function buildParametersSchema(
     }
   }
 
+  // 添加可选的 _baseUrl 参数
+  shape._baseUrl = z
+    .string()
+    .url()
+    .optional()
+    .describe('API base URL (overrides the default). Example: https://api.example.com');
+
   return shape;
 }
 
