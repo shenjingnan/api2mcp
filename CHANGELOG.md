@@ -2,6 +2,8 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.2.0](https://github.com/shenjingnan/api2mcp/compare/v0.2.0-beta.1...v0.2.0) (2026-03-24)
+
 # [0.2.0-beta.1](https://github.com/shenjingnan/api2mcp/compare/v0.2.0-beta.0...v0.2.0-beta.1) (2026-03-24)
 
 # [0.2.0-beta.0](https://github.com/shenjingnan/api2mcp/compare/v0.1.0...v0.2.0-beta.0) (2026-03-24)
