@@ -1,0 +1,37 @@
+{
+  "git": {
+    "commitMessage": "chore(release): v${version}",
+    "tag": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "github": {
+    "release": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits"
+      },
+      "infile": "CHANGELOG.md",
+      "header": "# Changelog\n\nAll notable changes to this project will be documented in this file.",
+      "types": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Code Refactoring" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "test", "section": "Tests" },
+        { "type": "build", "section": "Build System" },
+        { "type": "ci", "section": "CI/CD" },
+        { "type": "chore", "hidden": true }
+      ]
+    }
+  },
+  "hooks": {
+    "before:init": ["pnpm run lint", "pnpm run test", "pnpm run build"],
+    "after:bump": "git checkout -b release/v${version}",
+    "after:release": "git push -u origin release/v${version} && gh pr create --title 'chore(release): v${version}' --body 'Automated release for version ${version}. Please review the changes and merge to trigger the release.' --base main"
+  }
+}
