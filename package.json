@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "api2mcp": "./bin/api2mcp.js"
+    "api2mcp": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsup && node scripts/add-shebang.js",
+    "build": "tsup",
     "dev": "tsup --watch",
     "start": "node dist/cli.js",
     "typecheck": "tsc --noEmit",
@@ -71,7 +71,6 @@
   },
   "files": [
     "dist",
-    "bin",
     "README.md"
   ]
 }
