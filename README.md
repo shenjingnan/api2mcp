@@ -12,7 +12,23 @@
 ## 安装
 
 ```bash
-# 使用 pnpm
+# 推荐使用 npx，无需安装
+npx api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
+
+# 或全局安装
+npm install -g api2mcp
+# 或
+pnpm add -g api2mcp
+```
+
+## 从源码构建
+
+```bash
+# 克隆仓库
+git clone https://github.com/shenjingnan/api2mcp.git
+cd api2mcp
+
+# 安装依赖
 pnpm install
 
 # 构建
@@ -21,23 +37,40 @@ pnpm build
 
 ## 使用方法
 
-### CLI
+### npx 快速使用（推荐）
+
+无需安装，直接使用 npx 运行：
 
 ```bash
 # 基本使用
-api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
+npx api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
 
 # 指定基础 URL
-api2mcp --url ./openapi.json --base-url https://api.example.com
+npx api2mcp --url ./openapi.json --base-url https://api.example.com
 
 # 带认证头
-api2mcp --url https://api.example.com/openapi.json --headers '{"Authorization":"Bearer xxx"}'
+npx api2mcp --url https://api.example.com/openapi.json --headers '{"Authorization":"Bearer xxx"}'
 
 # 带工具前缀
-api2mcp --url https://api.example.com/openapi.json --prefix myapi
+npx api2mcp --url https://api.example.com/openapi.json --prefix myapi
 
 # 调试模式
-api2mcp --url https://api.example.com/openapi.json --debug
+npx api2mcp --url https://api.example.com/openapi.json --debug
+```
+
+### CLI
+
+如果需要全局安装：
+
+```bash
+# 使用 pnpm 全局安装
+pnpm add -g api2mcp
+
+# 或使用 npm 全局安装
+npm install -g api2mcp
+
+# 然后直接运行
+api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
 ```
 
 ### CLI 参数
@@ -84,7 +117,7 @@ api2mcp --url https://api.example.com/openapi.json --debug
 
 ### 在 Claude Desktop 中使用
 
-在 Claude Desktop 配置文件中添加:
+在 Claude Desktop 配置文件中添加：
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -93,12 +126,14 @@ api2mcp --url https://api.example.com/openapi.json --debug
 {
   "mcpServers": {
     "api2mcp": {
-      "command": "node",
-      "args": ["/path/to/api2mcp/bin/api2mcp.js", "--url", "https://api.example.com/openapi.json"]
+      "command": "npx",
+      "args": ["-y", "api2mcp", "--url", "https://api.example.com/openapi.json"]
     }
   }
 }
 ```
+
+> **注意**: 使用 `-y` 参数可以自动确认 npx 的安装提示，避免交互式确认。
 
 ## 配置优先级
 
