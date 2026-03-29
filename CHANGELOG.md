@@ -2,6 +2,13 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.6.0](https://github.com/shenjingnan/api2mcp/compare/v0.5.0...v0.6.0) (2026-03-29)
+
+
+### Features
+
+* **config:** 支持固定参数（fixedParams）功能 ([#26](https://github.com/shenjingnan/api2mcp/issues/26)) ([a4e5e9e](https://github.com/shenjingnan/api2mcp/commit/a4e5e9e13b158df538175be30d14acc8590ff01a))
+
 # [0.5.0](https://github.com/shenjingnan/api2mcp/compare/v0.4.0...v0.5.0) (2026-03-29)
 
 
