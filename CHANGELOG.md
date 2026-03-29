@@ -2,6 +2,13 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.4.0](https://github.com/shenjingnan/api2mcp/compare/v0.4.0-beta.0...v0.4.0) (2026-03-29)
+
+
+### Bug Fixes
+
+* **registry:** 修复 requestBodySchema 中 required 字段被布尔值覆盖的 bug ([#22](https://github.com/shenjingnan/api2mcp/issues/22)) ([ab64e89](https://github.com/shenjingnan/api2mcp/commit/ab64e89f09f3f7c301476318e2a7b7208a12713a))
+
 # [0.4.0-beta.0](https://github.com/shenjingnan/api2mcp/compare/v0.3.2...v0.4.0-beta.0) (2026-03-29)
 
 
