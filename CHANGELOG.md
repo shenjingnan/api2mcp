@@ -2,6 +2,13 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.4.0-beta.0](https://github.com/shenjingnan/api2mcp/compare/v0.3.2...v0.4.0-beta.0) (2026-03-29)
+
+
+### Features
+
+* 新增按需模式 (ondemand)，支持大型 OpenAPI 文档的高效使用 ([#20](https://github.com/shenjingnan/api2mcp/issues/20)) ([8c29817](https://github.com/shenjingnan/api2mcp/commit/8c2981781c1f845f2a7d41ec68405a951cb28b0f))
+
 ## [0.3.2](https://github.com/shenjingnan/api2mcp/compare/v0.3.1...v0.3.2) (2026-03-26)
 
 ## [0.3.1](https://github.com/shenjingnan/api2mcp/compare/v0.3.0...v0.3.1) (2026-03-25)
