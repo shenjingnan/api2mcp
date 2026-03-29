@@ -141,8 +141,13 @@ export function executeApiDetail(registry: ApiRegistry, input: ApiDetailInput): 
 
   // 请求体
   if (detail.requestBodySchema) {
+    const bodyRequired = detail.requestBodySchema.bodyRequired;
     lines.push('### 请求体');
     lines.push('');
+    if (bodyRequired) {
+      lines.push('**必填**: 是');
+      lines.push('');
+    }
     lines.push(formatSchema(detail.requestBodySchema));
     lines.push('');
   }
