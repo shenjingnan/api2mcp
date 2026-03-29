@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "mcp__zread__search_doc",
+      "WebSearch",
+      "Skill(commit-commands:commit-push-pr)",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(timeout *)",
+      "Bash(find *)",
+      "Bash(python3 *)",
+      "Bash(cd *)"
+    ]
+  },
+  "attribution": {
+    "commit": "🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: GLM-5.1 <noreply@bigmodel.cn>",
+    "pr": ""
+  }
+}

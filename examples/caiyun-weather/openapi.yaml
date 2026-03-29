@@ -1,0 +1,173 @@
+openapi: "3.0.0"
+info:
+  title: 彩云天气 API
+  version: "2.6"
+  description: |
+    彩云天气 API 提供精准的天气预报服务。
+    本文档仅作 api2mcp 的 fixedParams 功能演示用途。
+
+servers:
+  - url: https://api.caiyunapp.com
+
+paths:
+  /v2.6/{appKey}/{location}/weather:
+    get:
+      operationId: getWeather
+      summary: 实时天气查询
+      description: 查询指定位置的实时天气、小时级预报、每日预报等完整天气信息
+      tags:
+        - 天气
+      parameters:
+        - name: appKey
+          in: path
+          required: true
+          description: API 鉴权密钥（通过 fixedParams 预填，无需手动传入）
+          schema:
+            type: string
+        - name: location
+          in: path
+          required: true
+          description: |
+            经纬度坐标，格式为 `经度,纬度`（注意经度在前）
+            例如：`116.4,39.9`（北京天安门）
+          schema:
+            type: string
+        - name: dailysteps
+          in: query
+          required: false
+          description: 每日预报天数（1-7），默认为 7
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 7
+            default: 7
+        - name: hourlysteps
+          in: query
+          required: false
+          description: 小时级预报时长（1-48），默认为 48
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 48
+            default: 48
+        - name: alert
+          in: query
+          required: false
+          description: 是否返回气象预警信息
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: 成功返回天气数据
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  result:
+                    type: object
+                    properties:
+                      realtime:
+                        type: object
+                        description: 实时天气数据
+                        properties:
+                          temperature:
+                            type: number
+                            description: 温度（摄氏度）
+                          humidity:
+                            type: number
+                            description: 相对湿度（0-1）
+                          skycon:
+                            type: string
+                            description: 天气现象（如 CLEAR_DAY, CLOUDY, RAIN 等）
+                          wind:
+                            type: object
+                            properties:
+                              speed:
+                                type: number
+                              direction:
+                                type: number
+                      daily:
+                        type: object
+                        description: 每日预报
+                      hourly:
+                        type: object
+                        description: 小时级预报
+                      alert:
+                        type: object
+                        description: 气象预警
+
+  /v2.6/{appKey}/{location}/daily:
+    get:
+      operationId: getDaily
+      summary: 每日天气预报
+      description: 查询指定位置的每日天气预报
+      tags:
+        - 天气
+      parameters:
+        - name: appKey
+          in: path
+          required: true
+          description: API 鉴权密钥（通过 fixedParams 预填，无需手动传入）
+          schema:
+            type: string
+        - name: location
+          in: path
+          required: true
+          description: |
+            经纬度坐标，格式为 `经度,纬度`（注意经度在前）
+            例如：`116.4,39.9`（北京天安门）
+          schema:
+            type: string
+        - name: dailysteps
+          in: query
+          required: false
+          description: 预报天数（1-7），默认为 7
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 7
+            default: 7
+      responses:
+        "200":
+          description: 成功返回每日预报数据
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  result:
+                    type: object
+                    properties:
+                      daily:
+                        type: object
+                        properties:
+                          temperature:
+                            type: array
+                            description: 每日温度范围
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                max:
+                                  type: number
+                                min:
+                                  type: number
+                          skycon:
+                            type: array
+                            description: 每日天气现象
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                value:
+                                  type: string
