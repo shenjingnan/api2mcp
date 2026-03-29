@@ -8,6 +8,7 @@
 - 📝 **完整支持**: 支持 OpenAPI 3.x 规范，包括路径参数、查询参数、请求体等
 - 🚀 **简单易用**: 通过 CLI 或配置文件快速启动
 - 🔌 **MCP 兼容**: 完全兼容 MCP 协议，可在 Claude Desktop 等 MCP 客户端中使用
+- 🎯 **按需模式**: 针对大型 OpenAPI 文档，提供按需发现和调用 API 的模式
 
 ## 安装
 
@@ -82,6 +83,7 @@ api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
 | `--timeout` | `-t` | 请求超时时间 (毫秒) |
 | `--headers` | `-h` | 自定义请求头 (JSON 字符串) |
 | `--prefix` | `-p` | 工具名前缀 |
+| `--mode` | `-m` | 工作模式：`default`（默认）或 `ondemand`（按需） |
 | `--debug` | `-d` | 启用调试模式 |
 
 ### 配置文件
@@ -101,9 +103,60 @@ api2mcp --url https://petstore3.swagger.io/api/v3/openapi.json
   "headers": {
     "Authorization": "Bearer your-token"
   },
-  "toolPrefix": "myapi"
+  "toolPrefix": "myapi",
+  "mode": "default"
 }
 ```
+
+## 工作模式
+
+api2mcp 支持两种工作模式：
+
+### 默认模式 (default)
+
+将所有 API 直接转换为 MCP 工具。适合 API 数量较少的场景。
+
+```bash
+npx api2mcp --url https://api.example.com/openapi.json --mode default
+```
+
+### 按需模式 (ondemand)
+
+当 OpenAPI 文档包含大量端点（如数百或数千个）时，按需模式提供更好的体验：
+
+- **减少上下文占用**: 不会预先注册所有工具，节省 LLM 上下文空间
+- **按需发现**: LLM 可以搜索和浏览可用的 API
+- **直接执行**: 找到需要的 API 后直接调用
+
+```bash
+npx api2mcp --url https://api.example.com/openapi.json --mode ondemand
+```
+
+#### 按需模式提供的工具
+
+| 工具名 | 功能 |
+|--------|------|
+| `api_list` | 分页浏览所有 API，支持按标签过滤 |
+| `api_search` | 模糊搜索 API（名称、摘要、描述、路径） |
+| `api_detail` | 获取 API 的详细信息和参数 Schema |
+| `api_execute` | 直接执行 API 调用 |
+
+#### 使用示例
+
+```
+用户: 我需要查询用户信息
+
+LLM 调用流程:
+1. api_search(query="user") → 找到相关 API
+2. api_detail(id="get_user") → 查看参数要求
+3. api_execute(operationId="get_user", parameters={userId: 123}) → 执行调用
+```
+
+#### 推荐场景
+
+- OpenAPI 文档包含 100+ 个端点
+- API 数量众多但通常只需要少数几个
+- 希望减少 MCP 客户端的加载时间
 
 ### 环境变量
 

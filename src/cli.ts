@@ -22,6 +22,11 @@ program
   .option('-t, --timeout <ms>', 'Request timeout in milliseconds', parseInt)
   .option('-h, --headers <json>', 'Custom headers as JSON string')
   .option('-p, --prefix <prefix>', 'Tool name prefix')
+  .option(
+    '-m, --mode <mode>',
+    'Working mode: default (all APIs as tools) or ondemand (discovery tools)',
+    'default'
+  )
   .option('-d, --debug', 'Enable debug mode', false)
   .action(async (options) => {
     let config: Config | undefined;
@@ -33,6 +38,7 @@ program
         timeout: options.timeout,
         headers: options.headers,
         prefix: options.prefix,
+        mode: options.mode,
         debug: options.debug,
       });
 
@@ -41,6 +47,7 @@ program
       if (config.baseUrl) {
         logger.info(`Base URL: ${config.baseUrl}`);
       }
+      logger.info(`Mode: ${config.mode || 'default'}`);
 
       // 启动服务器
       await startServer(config);

@@ -6,6 +6,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Config } from '../config/types.js';
 import type { GeneratedTool } from '../converter/tool-generator.js';
 import { executeRequest, formatResponse } from '../executor/http-client.js';
+import type { OpenApiOperation } from '../parser/types.js';
 import { ToolExecutionError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
 
@@ -53,6 +54,25 @@ export class ToolManager {
       this.registerTool(tool);
     }
     logger.info(`Registered ${tools.length} tools`);
+  }
+
+  /**
+   * 获取工具
+   */
+  getTool(name: string): GeneratedTool | undefined {
+    return this.tools.get(name);
+  }
+
+  /**
+   * 通过 operationId 获取工具
+   */
+  getToolByOperationId(operationId: string): GeneratedTool | undefined {
+    for (const tool of this.tools.values()) {
+      if (tool.operation.operationId === operationId) {
+        return tool;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -118,6 +138,55 @@ export class ToolManager {
   }
 
   /**
+   * 通过 operation 直接执行（用于 ondemand 模式）
+   */
+  async executeByOperation(
+    operation: OpenApiOperation,
+    args: Record<string, unknown>
+  ): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
+    try {
+      logger.debug(`Executing operation: ${operation.operationId || operation.path}`, args);
+
+      // 提取 _baseUrl 参数
+      const { _baseUrl, ...restArgs } = args;
+
+      // 创建临时配置，优先使用参数中的 _baseUrl
+      const executionConfig = {
+        ...this.config,
+        baseUrl: typeof _baseUrl === 'string' ? _baseUrl : this.config.baseUrl,
+      };
+
+      const response = await executeRequest(operation, restArgs, executionConfig);
+      const formattedResponse = formatResponse(response);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: formattedResponse,
+          },
+        ],
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof ToolExecutionError
+          ? `Error: ${error.message}`
+          : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+
+      logger.error(`Operation execution failed: ${operation.operationId || operation.path}`, error);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: errorMessage,
+          },
+        ],
+      };
+    }
+  }
+
+  /**
    * 获取所有已注册的工具名称
    */
   getToolNames(): string[] {
@@ -129,6 +198,13 @@ export class ToolManager {
    */
   getToolCount(): number {
     return this.tools.size;
+  }
+
+  /**
+   * 获取配置
+   */
+  getConfig(): Config {
+    return this.config;
   }
 }
 
