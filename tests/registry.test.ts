@@ -234,6 +234,46 @@ describe('ApiRegistry', () => {
       expect(detail?.responseSchemas).toBeDefined();
     });
 
+    it('should preserve schema.required array and add bodyRequired in requestBodySchema', () => {
+      const registry = new ApiRegistry();
+      const entry = createTestEntry('pet-api', {
+        operation: {
+          method: 'PUT',
+          path: '/pet',
+          operationId: 'pet-api',
+          requestBody: {
+            required: true,
+            description: 'Pet object',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    photoUrls: { type: 'array', items: { type: 'string' } },
+                    status: { type: 'string' },
+                  },
+                  required: ['name', 'photoUrls'],
+                },
+              },
+            },
+          },
+        },
+      });
+
+      registry.register(entry);
+      const detail = registry.getDetail('pet-api');
+
+      expect(detail).toBeDefined();
+      const bodySchema = detail!.requestBodySchema!;
+      // schema.required 应保留为数组
+      expect(bodySchema.required).toEqual(['name', 'photoUrls']);
+      // requestBody.required 应保存在 bodyRequired 字段中
+      expect(bodySchema.bodyRequired).toBe(true);
+      // description 应保留
+      expect(bodySchema.description).toBe('Pet object');
+    });
+
     it('should return undefined for non-existent API', () => {
       const registry = new ApiRegistry();
 

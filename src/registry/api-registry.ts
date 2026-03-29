@@ -315,7 +315,7 @@ export class ApiRegistry {
     return {
       ...jsonContent.schema,
       description: operation.requestBody.description,
-      required: operation.requestBody.required,
+      bodyRequired: operation.requestBody.required,
     };
   }
 
