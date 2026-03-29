@@ -2,6 +2,8 @@
  * MCP 服务器
  */
 
+declare const VERSION: string;
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import type { Config } from '../config/types.js';
@@ -121,7 +123,7 @@ export async function createServer(config: Config): Promise<McpServer> {
   // 创建 MCP 服务器实例
   const server = new McpServer({
     name: 'api2mcp',
-    version: '0.1.0',
+    version: VERSION,
   });
 
   // 解析 OpenAPI 文档

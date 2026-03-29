@@ -4,6 +4,8 @@
  * CLI 入口
  */
 
+declare const VERSION: string;
+
 import { Command } from 'commander';
 import { loadConfig } from './config/loader.js';
 import type { Config } from './config/types.js';
@@ -16,7 +18,7 @@ const program = new Command();
 program
   .name('api2mcp')
   .description('Convert OpenAPI specifications to MCP tools')
-  .version('0.1.0')
+  .version(VERSION)
   .option('-u, --url <url>', 'OpenAPI document URL or file path')
   .option('-b, --base-url <url>', 'API base URL (overrides OpenAPI servers)')
   .option('-t, --timeout <ms>', 'Request timeout in milliseconds', parseInt)
