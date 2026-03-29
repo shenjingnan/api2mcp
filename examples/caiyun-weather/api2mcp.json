@@ -1,17 +1,17 @@
 {
   "mcpServers": {
     "caiyun-weather": {
-      "command": "npx",
+      "command": "node",
       "args": [
-        "-y",
         "api2mcp",
         "--url",
         "/path/to/examples/caiyun-weather/openapi.yaml",
         "--base-url",
-        "https://api.caiyunapp.com",
-        "--fixed-params",
-        "{\"appKey\":\"YOUR_APP_KEY\"}"
-      ]
+        "https://api.caiyunapp.com"
+      ],
+      "env": {
+        "API_FIXED_PARAMS": "{\"appKey\":\"YOUR_APP_KEY\"}"
+      }
     }
   }
 }

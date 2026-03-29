@@ -166,6 +166,7 @@ LLM 调用流程:
 | `API_BASE_URL` | API 基础 URL |
 | `API_TIMEOUT` | 请求超时时间 (毫秒) |
 | `API_HEADERS` | 自定义请求头 (JSON 字符串) |
+| `API_FIXED_PARAMS` | 固定参数 (JSON 字符串)，这些参数会注入到每个 API 请求中，但不会暴露给 LLM |
 | `DEBUG` | 启用调试模式 |
 
 ### 在 Claude Desktop 中使用
@@ -187,6 +188,31 @@ LLM 调用流程:
 ```
 
 > **注意**: 使用 `-y` 参数可以自动确认 npx 的安装提示，避免交互式确认。
+
+### 使用环境变量传递敏感参数
+
+当 API 需要认证密钥等敏感参数时，推荐使用 MCP 客户端的 `env` 字段通过环境变量传递，而非 `--fixed-params` CLI 参数。这样可以避免密钥以明文形式出现在进程参数中（进程参数可通过 `ps` 等命令被其他用户查看）。
+
+```json
+{
+  "mcpServers": {
+    "my-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "api2mcp",
+        "--url",
+        "https://api.example.com/openapi.json"
+      ],
+      "env": {
+        "API_FIXED_PARAMS": "{\"appKey\":\"YOUR_APP_KEY\"}"
+      }
+    }
+  }
+}
+```
+
+`API_FIXED_PARAMS` 的值为 JSON 字符串，其中的键值对会作为固定参数注入到每个 API 请求中。这些参数对 LLM 不可见，适合传递 API 密钥、token 等敏感信息。
 
 ## 配置优先级
 
