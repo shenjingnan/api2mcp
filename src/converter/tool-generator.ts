@@ -87,7 +87,8 @@ function generateToolDescription(operation: OpenApiOperation): string {
  */
 function buildParametersSchema(
   operation: OpenApiOperation,
-  refResolver: ReturnType<typeof createRefResolver>
+  refResolver: ReturnType<typeof createRefResolver>,
+  fixedParams?: Record<string, string>
 ): z.ZodRawShape {
   const shape: z.ZodRawShape = {};
 
@@ -95,6 +96,11 @@ function buildParametersSchema(
   if (operation.parameters) {
     for (const param of operation.parameters) {
       const paramName = param.name;
+
+      // 跳过固定参数（不暴露给 LLM）
+      if (fixedParams && paramName in fixedParams) {
+        continue;
+      }
       let paramSchema = convertSchema(param.schema, refResolver);
 
       // 添加描述
@@ -162,13 +168,14 @@ function buildParametersSchema(
 export function generateTool(
   operation: OpenApiOperation,
   components?: Record<string, OpenApiSchema>,
-  toolPrefix?: string
+  toolPrefix?: string,
+  fixedParams?: Record<string, string>
 ): GeneratedTool {
   const refResolver = createRefResolver(components);
 
   const name = generateToolName(operation, toolPrefix);
   const description = generateToolDescription(operation);
-  const parametersShape = buildParametersSchema(operation, refResolver);
+  const parametersShape = buildParametersSchema(operation, refResolver, fixedParams);
   const inputSchema = z.object(parametersShape);
 
   logger.debug(`Generated tool: ${name}`);
@@ -187,13 +194,14 @@ export function generateTool(
 export function generateTools(
   operations: OpenApiOperation[],
   components?: Record<string, OpenApiSchema>,
-  toolPrefix?: string
+  toolPrefix?: string,
+  fixedParams?: Record<string, string>
 ): GeneratedTool[] {
   const tools: GeneratedTool[] = [];
   const usedNames = new Set<string>();
 
   for (const operation of operations) {
-    const tool = generateTool(operation, components, toolPrefix);
+    const tool = generateTool(operation, components, toolPrefix, fixedParams);
 
     // 处理名称冲突
     if (usedNames.has(tool.name)) {

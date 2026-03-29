@@ -38,7 +38,7 @@ export async function executeRequest(
 
   try {
     // 构建请求
-    const built = buildRequest(operation, input, config.headers || {});
+    const built = buildRequest(operation, input, config.headers || {}, config.fixedParams || {});
 
     // 构建完整 URL
     let url = `${baseUrl}${built.path}`;

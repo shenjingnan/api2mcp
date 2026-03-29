@@ -142,7 +142,8 @@ export async function createServer(config: Config): Promise<McpServer> {
   const tools = generateTools(
     openApiDoc.operations,
     openApiDoc.components?.schemas,
-    config.toolPrefix
+    config.toolPrefix,
+    effectiveConfig.fixedParams
   );
 
   // 根据模式选择初始化路径

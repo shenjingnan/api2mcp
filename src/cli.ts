@@ -23,6 +23,10 @@ program
   .option('-b, --base-url <url>', 'API base URL (overrides OpenAPI servers)')
   .option('-t, --timeout <ms>', 'Request timeout in milliseconds', parseInt)
   .option('-h, --headers <json>', 'Custom headers as JSON string')
+  .option(
+    '-f, --fixed-params <json>',
+    'Fixed parameters as JSON string (pre-filled, hidden from LLM)'
+  )
   .option('-p, --prefix <prefix>', 'Tool name prefix')
   .option(
     '-m, --mode <mode>',
@@ -39,6 +43,7 @@ program
         baseUrl: options.baseUrl,
         timeout: options.timeout,
         headers: options.headers,
+        fixedParams: options.fixedParams,
         prefix: options.prefix,
         mode: options.mode,
         debug: options.debug,

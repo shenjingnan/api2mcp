@@ -47,14 +47,15 @@ function groupParametersByLocation(
 export function buildRequest(
   operation: OpenApiOperation,
   input: Record<string, unknown>,
-  defaultHeaders: Record<string, string> = {}
+  defaultHeaders: Record<string, string> = {},
+  fixedParams: Record<string, string> = {}
 ): BuiltRequest {
   const groupedParams = groupParametersByLocation(operation.parameters);
 
   // 构建路径
   let path = operation.path;
   for (const param of groupedParams.path) {
-    const value = input[param.name];
+    const value = input[param.name] ?? fixedParams[param.name];
     if (value !== undefined) {
       path = path.replace(`{${param.name}}`, String(value));
     } else if (param.required) {
@@ -65,7 +66,7 @@ export function buildRequest(
   // 构建查询参数
   const query: Record<string, string | string[]> = {};
   for (const param of groupedParams.query) {
-    const value = input[param.name];
+    const value = input[param.name] ?? fixedParams[param.name];
     if (value !== undefined) {
       if (Array.isArray(value)) {
         query[param.name] = value.map(String);
