@@ -81,6 +81,7 @@ function loadFromFile(workingDir: string = process.cwd()): Partial<Config> | nul
           headers: parsed.headers,
           toolPrefix: parsed.toolPrefix,
           debug: parsed.debug,
+          mode: parsed.mode,
         };
       } catch (error) {
         throw new ConfigurationError(
@@ -124,6 +125,10 @@ function loadFromCli(args: CliArgs): Partial<Config> {
     config.debug = args.debug;
   }
 
+  if (args.mode) {
+    config.mode = args.mode;
+  }
+
   return config;
 }
 
@@ -143,6 +148,7 @@ function mergeConfigs(...configs: Array<Partial<Config>>): Config {
     if (config.headers !== undefined) merged.headers = config.headers;
     if (config.toolPrefix !== undefined) merged.toolPrefix = config.toolPrefix;
     if (config.debug !== undefined) merged.debug = config.debug;
+    if (config.mode !== undefined) merged.mode = config.mode;
   }
 
   // 设置默认值
@@ -181,6 +187,7 @@ export function loadConfig(cliArgs: CliArgs = {}, env: EnvConfig = process.env):
     baseUrl: config.baseUrl,
     timeout: config.timeout,
     toolPrefix: config.toolPrefix,
+    mode: config.mode,
     debug: config.debug,
   });
 

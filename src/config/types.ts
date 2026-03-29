@@ -10,6 +10,11 @@ import { z } from 'zod';
 export type ApiHeaders = Record<string, string>;
 
 /**
+ * 工作模式
+ */
+export type Mode = 'default' | 'ondemand';
+
+/**
  * 单个 API 源配置
  */
 export interface ApiSourceConfig {
@@ -23,6 +28,8 @@ export interface ApiSourceConfig {
   headers?: ApiHeaders;
   /** 工具名前缀 */
   toolPrefix?: string;
+  /** 工作模式：default（默认）或 ondemand（按需） */
+  mode?: Mode;
 }
 
 /**
@@ -43,6 +50,7 @@ export const CliArgsSchema = z.object({
   headers: z.string().optional(),
   prefix: z.string().optional(),
   debug: z.boolean().optional(),
+  mode: z.enum(['default', 'ondemand']).optional(),
 });
 
 export type CliArgs = z.infer<typeof CliArgsSchema>;
@@ -68,6 +76,7 @@ export const ConfigFileSchema = z.object({
   headers: z.record(z.string()).optional(),
   toolPrefix: z.string().optional(),
   debug: z.boolean().optional(),
+  mode: z.enum(['default', 'ondemand']).optional(),
 });
 
 export type ConfigFile = z.infer<typeof ConfigFileSchema>;

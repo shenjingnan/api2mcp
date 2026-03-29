@@ -16,7 +16,8 @@
     "unmarshal",
     "petstore",
     "myapi",
-    "APIV"
+    "APIV",
+    "ondemand"
   ],
   "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
 }
