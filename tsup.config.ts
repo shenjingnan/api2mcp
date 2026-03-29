@@ -1,4 +1,8 @@
 import { defineConfig } from 'tsup';
+import { readFileSync } from 'node:fs';
+
+// 从 package.json 读取版本号
+const pkg = JSON.parse(readFileSync('package.json', 'utf-8'));
 
 export default defineConfig({
   entry: {
@@ -11,4 +15,7 @@ export default defineConfig({
   clean: true,
   shims: true,
   external: [],
+  define: {
+    VERSION: JSON.stringify(pkg.version),
+  },
 });
