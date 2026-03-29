@@ -2,6 +2,13 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.5.0](https://github.com/shenjingnan/api2mcp/compare/v0.4.0...v0.5.0) (2026-03-29)
+
+
+### Features
+
+* **build:** 从 package.json 动态读取版本号，移除硬编码版本 ([#24](https://github.com/shenjingnan/api2mcp/issues/24)) ([b8c136d](https://github.com/shenjingnan/api2mcp/commit/b8c136d62182f72c250891de7c2f753fd12769e2))
+
 # [0.4.0](https://github.com/shenjingnan/api2mcp/compare/v0.4.0-beta.0...v0.4.0) (2026-03-29)
 
 
