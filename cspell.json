@@ -17,7 +17,13 @@
     "petstore",
     "myapi",
     "APIV",
-    "ondemand"
+    "ondemand",
+    "caiyun",
+    "dailysteps",
+    "hourlysteps",
+    "skycon",
+    "Mdbq",
+    "IPLP"
   ],
   "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
 }

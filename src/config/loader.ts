@@ -32,6 +32,25 @@ function parseHeaders(headersStr: string | undefined): Record<string, string> | 
 }
 
 /**
+ * 解析 JSON 格式的固定参数字符串
+ */
+function parseFixedParams(paramsStr: string | undefined): Record<string, string> | undefined {
+  if (!paramsStr) return undefined;
+
+  try {
+    const parsed = JSON.parse(paramsStr);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed as Record<string, string>;
+    }
+    throw new Error('Fixed params must be a JSON object');
+  } catch (error) {
+    throw new ConfigurationError(
+      `Invalid fixedParams JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+/**
  * 从环境变量加载配置
  */
 function loadFromEnv(env: EnvConfig): Partial<Config> {
@@ -54,6 +73,10 @@ function loadFromEnv(env: EnvConfig): Partial<Config> {
 
   if (env.API_HEADERS) {
     config.headers = parseHeaders(env.API_HEADERS);
+  }
+
+  if (env.API_FIXED_PARAMS) {
+    config.fixedParams = parseFixedParams(env.API_FIXED_PARAMS);
   }
 
   if (env.DEBUG) {
@@ -79,6 +102,7 @@ function loadFromFile(workingDir: string = process.cwd()): Partial<Config> | nul
           baseUrl: parsed.baseUrl,
           timeout: parsed.timeout,
           headers: parsed.headers,
+          fixedParams: parsed.fixedParams,
           toolPrefix: parsed.toolPrefix,
           debug: parsed.debug,
           mode: parsed.mode,
@@ -117,6 +141,10 @@ function loadFromCli(args: CliArgs): Partial<Config> {
     config.headers = parseHeaders(args.headers);
   }
 
+  if (args.fixedParams) {
+    config.fixedParams = parseFixedParams(args.fixedParams);
+  }
+
   if (args.prefix) {
     config.toolPrefix = args.prefix;
   }
@@ -146,6 +174,7 @@ function mergeConfigs(...configs: Array<Partial<Config>>): Config {
     if (config.baseUrl !== undefined) merged.baseUrl = config.baseUrl;
     if (config.timeout !== undefined) merged.timeout = config.timeout;
     if (config.headers !== undefined) merged.headers = config.headers;
+    if (config.fixedParams !== undefined) merged.fixedParams = config.fixedParams;
     if (config.toolPrefix !== undefined) merged.toolPrefix = config.toolPrefix;
     if (config.debug !== undefined) merged.debug = config.debug;
     if (config.mode !== undefined) merged.mode = config.mode;

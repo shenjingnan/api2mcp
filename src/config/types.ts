@@ -30,6 +30,8 @@ export interface ApiSourceConfig {
   toolPrefix?: string;
   /** 工作模式：default（默认）或 ondemand（按需） */
   mode?: Mode;
+  /** 固定参数（预填充到路径/查询参数中，不暴露给 LLM） */
+  fixedParams?: Record<string, string>;
 }
 
 /**
@@ -48,6 +50,7 @@ export const CliArgsSchema = z.object({
   baseUrl: z.string().optional(),
   timeout: z.coerce.number().positive().optional(),
   headers: z.string().optional(),
+  fixedParams: z.string().optional(),
   prefix: z.string().optional(),
   debug: z.boolean().optional(),
   mode: z.enum(['default', 'ondemand']).optional(),
@@ -63,6 +66,7 @@ export interface EnvConfig {
   API_BASE_URL?: string;
   API_TIMEOUT?: string;
   API_HEADERS?: string;
+  API_FIXED_PARAMS?: string;
   DEBUG?: string;
 }
 
@@ -74,6 +78,7 @@ export const ConfigFileSchema = z.object({
   baseUrl: z.string().optional(),
   timeout: z.number().positive().optional(),
   headers: z.record(z.string()).optional(),
+  fixedParams: z.record(z.string()).optional(),
   toolPrefix: z.string().optional(),
   debug: z.boolean().optional(),
   mode: z.enum(['default', 'ondemand']).optional(),
