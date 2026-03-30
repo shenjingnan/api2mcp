@@ -5,7 +5,7 @@
       "args": [
         "api2mcp",
         "--url",
-        "/path/to/examples/caiyun-weather/openapi.yaml",
+        "https://raw.githubusercontent.com/shenjingnan/api2mcp/refs/heads/main/examples/caiyun-weather/openapi.yaml",
         "--base-url",
         "https://api.caiyunapp.com"
       ],

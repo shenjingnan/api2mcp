@@ -6,7 +6,7 @@
         "-y",
         "api2mcp",
         "--url",
-        "/path/to/examples/amap-geo-assistant/openapi.yaml",
+        "https://raw.githubusercontent.com/shenjingnan/api2mcp/refs/heads/main/examples/amap-geo-assistant/openapi.yaml",
         "--base-url",
         "https://restapi.amap.com"
       ],
