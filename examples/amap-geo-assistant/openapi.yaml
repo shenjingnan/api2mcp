@@ -1,0 +1,279 @@
+openapi: "3.0.0"
+info:
+  title: 高德地图地理助手 API
+  version: "3.0"
+  description: |
+    高德地图 Web 服务 API，提供地理编码、POI 搜索、路径规划等功能。
+    本文档仅作 api2mcp 的 fixedParams 功能演示用途。
+    所有接口的 key 参数通过 fixedParams 预填，调用时无需手动传入。
+
+servers:
+  - url: https://restapi.amap.com
+
+paths:
+  /v3/geocode/geo:
+    get:
+      operationId: geocode
+      summary: 地理编码
+      description: |
+        将结构化地址转换为经纬度坐标。
+        例如：将"北京市朝阳区阜通东大街6号"转换为经纬度。
+        返回结果中包含格式化地址、行政区划信息和经纬度坐标。
+      tags:
+        - 地理编码
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: API 鉴权密钥（通过 fixedParams 预填，无需手动传入）
+          schema:
+            type: string
+        - name: address
+          in: query
+          required: true
+          description: |
+            结构化地址信息。
+            例如：`北京市朝阳区阜通东大街6号`
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: false
+          description: |
+            指定查询的城市。
+            可传入城市名称（如"北京"）或 adcode（如"010"）。
+            不传则在全国范围内搜索。
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回地理编码结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 返回状态（"1" 表示成功，"0" 表示失败）
+                  info:
+                    type: string
+                    description: 返回状态说明
+                  geocodes:
+                    type: array
+                    description: 地理编码结果列表
+                    items:
+                      type: object
+                      properties:
+                        formatted_address:
+                          type: string
+                          description: 格式化地址
+                        location:
+                          type: string
+                          description: 经纬度坐标，格式为 `经度,纬度`
+                        province:
+                          type: string
+                          description: 省份
+                        city:
+                          type: string
+                          description: 城市
+                        district:
+                          type: string
+                          description: 区县
+                        adcode:
+                          type: string
+                          description: 区域编码
+
+  /v3/place/text:
+    get:
+      operationId: searchPoi
+      summary: POI 关键字搜索
+      description: |
+        通过关键字搜索兴趣点（POI，Point of Interest）。
+        例如：搜索"北京大学"附近的"餐厅"。
+        支持分页查询，每页默认 20 条记录。
+      tags:
+        - POI 搜索
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: API 鉴权密钥（通过 fixedParams 预填，无需手动传入）
+          schema:
+            type: string
+        - name: keywords
+          in: query
+          required: true
+          description: |
+            搜索关键字。
+            例如：`餐厅`、`加油站`、`北京大学`
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: false
+          description: |
+            指定搜索的城市。
+            可传入城市名称（如"北京"）或 adcode（如"010"）。
+          schema:
+            type: string
+        - name: citylimit
+          in: query
+          required: false
+          description: |
+            是否仅返回指定城市的数据。
+            传入 `true` 表示仅返回 city 对应城市的数据。
+          schema:
+            type: boolean
+            default: false
+        - name: offset
+          in: query
+          required: false
+          description: 每页记录数，最大 25，默认 20
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 25
+            default: 20
+        - name: page
+          in: query
+          required: false
+          description: 当前页码，从 1 开始
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        "200":
+          description: 成功返回 POI 搜索结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 返回状态（"1" 表示成功，"0" 表示失败）
+                  count:
+                    type: string
+                    description: 搜索结果总数
+                  pois:
+                    type: array
+                    description: POI 列表
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: POI 名称
+                        address:
+                          type: string
+                          description: POI 地址
+                        location:
+                          type: string
+                          description: 经纬度坐标，格式为 `经度,纬度`
+                        type:
+                          type: string
+                          description: POI 类型
+                        tel:
+                          type: string
+                          description: 联系电话
+                        pname:
+                          type: string
+                          description: 省份名称
+                        cityname:
+                          type: string
+                          description: 城市名称
+                        adname:
+                          type: string
+                          description: 区县名称
+
+  /v3/direction/walking:
+    get:
+      operationId: planWalkingRoute
+      summary: 步行路径规划
+      description: |
+        规划两点之间的步行路线。
+        起点和终点需传入经纬度坐标（格式为 `经度,纬度`）。
+        可结合 geocode 工具先将地址转为经纬度，再进行路径规划。
+      tags:
+        - 路径规划
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: API 鉴权密钥（通过 fixedParams 预填，无需手动传入）
+          schema:
+            type: string
+        - name: origin
+          in: query
+          required: true
+          description: |
+            起点经纬度坐标，格式为 `经度,纬度`。
+            例如：`116.481028,39.989643`
+            可通过 geocode 工具将地址转换为经纬度。
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          description: |
+            终点经纬度坐标，格式为 `经度,纬度`。
+            例如：`116.465302,40.004717`
+            可通过 geocode 工具将地址转换为经纬度。
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回步行路径规划结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 返回状态（"1" 表示成功，"0" 表示失败）
+                  info:
+                    type: string
+                    description: 返回状态说明
+                  route:
+                    type: object
+                    description: 路径规划结果
+                    properties:
+                      origin:
+                        type: string
+                        description: 起点坐标
+                      destination:
+                        type: string
+                        description: 终点坐标
+                      paths:
+                        type: array
+                        description: 路径方案列表
+                        items:
+                          type: object
+                          properties:
+                            distance:
+                              type: string
+                              description: 路径总距离（单位：米）
+                            duration:
+                              type: string
+                              description: 预计步行时间（单位：秒）
+                            steps:
+                              type: array
+                              description: 导航步骤
+                              items:
+                                type: object
+                                properties:
+                                  instruction:
+                                    type: string
+                                    description: 步行导航指示
+                                  road:
+                                    type: string
+                                    description: 道路名称
+                                  distance:
+                                    type: string
+                                    description: 本段距离（单位：米）
+                                  duration:
+                                    type: string
+                                    description: 本段预计时间（单位：秒）

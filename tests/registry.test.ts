@@ -265,7 +265,7 @@ describe('ApiRegistry', () => {
       const detail = registry.getDetail('pet-api');
 
       expect(detail).toBeDefined();
-      const bodySchema = detail!.requestBodySchema!;
+      const bodySchema = detail?.requestBodySchema;
       // schema.required 应保留为数组
       expect(bodySchema.required).toEqual(['name', 'photoUrls']);
       // requestBody.required 应保存在 bodyRequired 字段中

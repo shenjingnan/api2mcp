@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "amap-geo-assistant": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "api2mcp",
+        "--url",
+        "/path/to/examples/amap-geo-assistant/openapi.yaml",
+        "--base-url",
+        "https://restapi.amap.com"
+      ],
+      "env": {
+        "API_FIXED_PARAMS": "{\"key\":\"YOUR_AMAP_KEY\"}"
+      }
+    }
+  }
+}
