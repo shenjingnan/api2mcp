@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "home-assistant": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "api2mcp",
+        "--url",
+        "https://raw.githubusercontent.com/shenjingnan/api2mcp/refs/heads/main/examples/home-assistant/openapi.yaml",
+        "--base-url",
+        "http://localhost:8123"
+      ],
+      "env": {
+        "API_HEADERS": "Authorization=Bearer YOUR_HA_TOKEN"
+      }
+    }
+  }
+}
