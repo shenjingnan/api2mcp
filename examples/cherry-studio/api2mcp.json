@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "cherry-studio": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "api2mcp",
+        "--url",
+        "http://127.0.0.1:23333/api-docs.json",
+        "--base-url",
+        "http://127.0.0.1:23333"
+      ],
+      "env": {
+        "API_HEADERS": "Authorization=Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
