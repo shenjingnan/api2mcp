@@ -131,5 +131,57 @@ describe('request-builder', () => {
 
       expect(result.query).toEqual({ apiKey: 'secret-key' });
     });
+
+    it('should use fixedParams as fallback for header params', () => {
+      const operation: OpenApiOperation = {
+        method: 'GET',
+        path: '/api/data',
+        operationId: 'getData',
+        parameters: [
+          { name: 'X-API-Key', in: 'header', required: true, schema: { type: 'string' } },
+          { name: 'Accept', in: 'header', required: false, schema: { type: 'string' } },
+        ],
+      };
+
+      const result = buildRequest(operation, {}, {}, { 'X-API-Key': 'header-secret' });
+
+      expect(result.headers['X-API-Key']).toBe('header-secret');
+      expect(result.headers.Accept).toBeUndefined();
+    });
+
+    it('should prefer input over fixedParams for header params', () => {
+      const operation: OpenApiOperation = {
+        method: 'GET',
+        path: '/api/data',
+        operationId: 'getData',
+        parameters: [
+          { name: 'X-API-Key', in: 'header', required: true, schema: { type: 'string' } },
+        ],
+      };
+
+      const result = buildRequest(
+        operation,
+        { 'X-API-Key': 'override-key' },
+        {},
+        { 'X-API-Key': 'fixed-key' }
+      );
+
+      expect(result.headers['X-API-Key']).toBe('override-key');
+    });
+
+    it('should throw error for missing required header param without fixedParams', () => {
+      const operation: OpenApiOperation = {
+        method: 'GET',
+        path: '/api/data',
+        operationId: 'getData',
+        parameters: [
+          { name: 'X-API-Key', in: 'header', required: true, schema: { type: 'string' } },
+        ],
+      };
+
+      expect(() => buildRequest(operation, {})).toThrow(
+        'Missing required header parameter: X-API-Key'
+      );
+    });
   });
 });

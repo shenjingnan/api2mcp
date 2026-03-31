@@ -81,7 +81,7 @@ export function buildRequest(
   // 构建请求头
   const headers: Record<string, string> = { ...defaultHeaders };
   for (const param of groupedParams.header) {
-    const value = input[param.name];
+    const value = input[param.name] ?? fixedParams[param.name];
     if (value !== undefined) {
       headers[param.name] = String(value);
     } else if (param.required) {

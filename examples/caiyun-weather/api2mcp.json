@@ -10,7 +10,7 @@
         "https://api.caiyunapp.com"
       ],
       "env": {
-        "API_FIXED_PARAMS": "{\"appKey\":\"YOUR_APP_KEY\"}"
+        "appKey": "YOUR_APP_KEY"
       }
     }
   }

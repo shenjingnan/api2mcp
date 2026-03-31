@@ -17,6 +17,8 @@ export interface OpenApiParameter {
   description?: string;
   schema?: OpenApiSchema;
   deprecated?: boolean;
+  /** OpenAPI x-fixed 扩展字段，标记该参数为固定参数，自动从同名环境变量读取值 */
+  xFixed?: boolean;
 }
 
 /**
