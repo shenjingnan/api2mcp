@@ -3,8 +3,8 @@ import { generateTool } from '../../src/converter/tool-generator.js';
 import type { OpenApiOperation } from '../../src/parser/types.js';
 
 describe('tool-generator', () => {
-  describe('_baseUrl parameter', () => {
-    it('should include _baseUrl parameter in generated tool', () => {
+  describe('_baseUrl 参数', () => {
+    it('生成的工具应包含 _baseUrl 参数', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -18,7 +18,7 @@ describe('tool-generator', () => {
       expect(tool.inputSchema.shape).toHaveProperty('_baseUrl');
     });
 
-    it('should make _baseUrl parameter optional', () => {
+    it('_baseUrl 参数应为可选的', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -34,7 +34,7 @@ describe('tool-generator', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate _baseUrl as URL format', () => {
+    it('_baseUrl 应验证为 URL 格式', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -56,7 +56,7 @@ describe('tool-generator', () => {
   });
 
   describe('fixedParams', () => {
-    it('should exclude fixed params from tool schema', () => {
+    it('应将固定参数从工具 schema 中排除', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -80,13 +80,13 @@ describe('tool-generator', () => {
 
       const tool = generateTool(operation, undefined, undefined, { appKey: 'secret123' });
 
-      // appKey should be hidden from LLM
+      // appKey 应对 LLM 隐藏
       expect(tool.inputSchema.shape).not.toHaveProperty('appKey');
-      // location should still be present
+      // location 应保留
       expect(tool.inputSchema.shape).toHaveProperty('location');
     });
 
-    it('should exclude fixed query params from tool schema', () => {
+    it('应将固定的查询参数从工具 schema 中排除', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -110,13 +110,13 @@ describe('tool-generator', () => {
 
       const tool = generateTool(operation, undefined, undefined, { apiKey: 'secret-key' });
 
-      // apiKey should be hidden
+      // apiKey 应被隐藏
       expect(tool.inputSchema.shape).not.toHaveProperty('apiKey');
-      // page should still be present
+      // page 应保留
       expect(tool.inputSchema.shape).toHaveProperty('page');
     });
 
-    it('should include all params when no fixedParams provided', () => {
+    it('未提供 fixedParams 时应包含所有参数', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -140,12 +140,12 @@ describe('tool-generator', () => {
 
       const tool = generateTool(operation);
 
-      // All params should be present
+      // 所有参数都应存在
       expect(tool.inputSchema.shape).toHaveProperty('appKey');
       expect(tool.inputSchema.shape).toHaveProperty('location');
     });
 
-    it('should not exclude params that are not in fixedParams', () => {
+    it('不应排除不在 fixedParams 中的参数', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -169,7 +169,7 @@ describe('tool-generator', () => {
 
       const tool = generateTool(operation, undefined, undefined, { token: 'other-value' });
 
-      // Neither appKey nor location is in fixedParams, so both should be present
+      // appKey 和 location 都不在 fixedParams 中，因此都应保留
       expect(tool.inputSchema.shape).toHaveProperty('appKey');
       expect(tool.inputSchema.shape).toHaveProperty('location');
     });

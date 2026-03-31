@@ -5,7 +5,7 @@ import { ToolExecutionError } from '../../src/utils/error.js';
 
 describe('http-client', () => {
   describe('executeRequest', () => {
-    it('should throw ToolExecutionError when no baseUrl is configured', async () => {
+    it('未配置 baseUrl 时应抛出 ToolExecutionError', async () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -25,7 +25,7 @@ describe('http-client', () => {
       await expect(executeRequest(operation, {}, config)).rejects.toThrow('No base URL configured');
     });
 
-    it('should throw error with helpful message about _baseUrl parameter', async () => {
+    it('错误信息中应包含 _baseUrl 参数的使用提示', async () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -42,7 +42,7 @@ describe('http-client', () => {
 
       try {
         await executeRequest(operation, {}, config);
-        expect.fail('Should have thrown an error');
+        expect.fail('应该抛出错误');
       } catch (error) {
         expect(error).toBeInstanceOf(ToolExecutionError);
         if (error instanceof ToolExecutionError) {

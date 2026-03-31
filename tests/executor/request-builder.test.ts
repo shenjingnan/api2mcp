@@ -4,7 +4,7 @@ import type { OpenApiOperation } from '../../src/parser/types.js';
 
 describe('request-builder', () => {
   describe('buildRequest', () => {
-    it('should replace path params from input', () => {
+    it('应该从输入中替换路径参数', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users/{id}',
@@ -16,7 +16,7 @@ describe('request-builder', () => {
       expect(result.path).toBe('/users/123');
     });
 
-    it('should throw error for missing required path param', () => {
+    it('缺少必需的路径参数时应抛出错误', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users/{id}',
@@ -28,8 +28,8 @@ describe('request-builder', () => {
     });
   });
 
-  describe('buildRequest with fixedParams', () => {
-    it('should use fixedParams as fallback for path params', () => {
+  describe('buildRequest 配合 fixedParams', () => {
+    it('应使用 fixedParams 作为路径参数的回退', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -50,7 +50,7 @@ describe('request-builder', () => {
       expect(result.path).toBe('/v2.6/Se04nQMdbqD5IPLP/39.9:116.4/weather');
     });
 
-    it('should prefer input over fixedParams when both are present', () => {
+    it('当 input 和 fixedParams 同时存在时应优先使用 input', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -71,7 +71,7 @@ describe('request-builder', () => {
       expect(result.path).toBe('/v2.6/override-key/39.9:116.4/weather');
     });
 
-    it('should use fixedParams as fallback for query params', () => {
+    it('应使用 fixedParams 作为查询参数的回退', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -87,7 +87,7 @@ describe('request-builder', () => {
       expect(result.query).toEqual({ apiKey: 'secret-key', page: '2' });
     });
 
-    it('should work with only fixedParams and no input params', () => {
+    it('仅使用 fixedParams 而无 input 参数时应正常工作', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/weather',
@@ -100,7 +100,7 @@ describe('request-builder', () => {
       expect(result.path).toBe('/v2.6/Se04nQMdbqD5IPLP/weather');
     });
 
-    it('should throw error when param is missing from both input and fixedParams', () => {
+    it('当 input 和 fixedParams 都缺少必需参数时应抛出错误', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/v2.6/{appKey}/{location}/weather',
@@ -116,7 +116,7 @@ describe('request-builder', () => {
       );
     });
 
-    it('should not throw for optional params missing from both input and fixedParams', () => {
+    it('可选参数在 input 和 fixedParams 中都缺失时不应抛出错误', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/users',
@@ -132,7 +132,7 @@ describe('request-builder', () => {
       expect(result.query).toEqual({ apiKey: 'secret-key' });
     });
 
-    it('should use fixedParams as fallback for header params', () => {
+    it('应使用 fixedParams 作为 header 参数的回退', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/api/data',
@@ -149,7 +149,7 @@ describe('request-builder', () => {
       expect(result.headers.Accept).toBeUndefined();
     });
 
-    it('should prefer input over fixedParams for header params', () => {
+    it('对于 header 参数应优先使用 input 而非 fixedParams', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/api/data',
@@ -169,7 +169,7 @@ describe('request-builder', () => {
       expect(result.headers['X-API-Key']).toBe('override-key');
     });
 
-    it('should throw error for missing required header param without fixedParams', () => {
+    it('缺少必需的 header 参数且无 fixedParams 时应抛出错误', () => {
       const operation: OpenApiOperation = {
         method: 'GET',
         path: '/api/data',

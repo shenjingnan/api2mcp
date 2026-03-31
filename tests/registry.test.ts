@@ -22,7 +22,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('register', () => {
-    it('should register an API entry', () => {
+    it('应该注册 API 条目', () => {
       const registry = new ApiRegistry();
       const entry = createTestEntry('test-api');
 
@@ -32,7 +32,7 @@ describe('ApiRegistry', () => {
       expect(registry.get('test-api')).toEqual(entry);
     });
 
-    it('should overwrite existing entry', () => {
+    it('应该覆盖已存在的条目', () => {
       const registry = new ApiRegistry();
       const entry1 = createTestEntry('test-api', { summary: 'First' });
       const entry2 = createTestEntry('test-api', { summary: 'Second' });
@@ -44,7 +44,7 @@ describe('ApiRegistry', () => {
       expect(registry.get('test-api')?.summary).toBe('Second');
     });
 
-    it('should index by name', () => {
+    it('应该按名称建立索引', () => {
       const registry = new ApiRegistry();
       const entry = createTestEntry('test-id', { name: 'test-name' });
 
@@ -53,7 +53,7 @@ describe('ApiRegistry', () => {
       expect(registry.getByName('test-name')).toEqual(entry);
     });
 
-    it('should index tags', () => {
+    it('应该索引标签', () => {
       const registry = new ApiRegistry();
       const entry = createTestEntry('test-api', { tags: ['users', 'admin'] });
 
@@ -64,7 +64,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('registerAll', () => {
-    it('should register multiple entries', () => {
+    it('应该批量注册多个条目', () => {
       const registry = new ApiRegistry();
       const entries = [createTestEntry('api1'), createTestEntry('api2'), createTestEntry('api3')];
 
@@ -75,7 +75,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('search', () => {
-    it('should search by name', () => {
+    it('应该按名称搜索', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('get-users'),
@@ -90,7 +90,7 @@ describe('ApiRegistry', () => {
       expect(results.map((r) => r.id)).toContain('create-user');
     });
 
-    it('should search by summary', () => {
+    it('应该按摘要搜索', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1', { summary: 'Get user information' }),
@@ -104,7 +104,7 @@ describe('ApiRegistry', () => {
       expect(results[0].matchedFields).toContain('summary');
     });
 
-    it('should search by path', () => {
+    it('应该按路径搜索', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1', { path: '/users/{id}' }),
@@ -117,7 +117,7 @@ describe('ApiRegistry', () => {
       expect(results[0].id).toBe('api1');
     });
 
-    it('should respect limit', () => {
+    it('应该遵守 limit 限制', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('user-api-1'),
@@ -130,7 +130,7 @@ describe('ApiRegistry', () => {
       expect(results.length).toBe(2);
     });
 
-    it('should return empty array for no matches', () => {
+    it('无匹配结果时应返回空数组', () => {
       const registry = new ApiRegistry();
       registry.register(createTestEntry('test-api'));
 
@@ -141,7 +141,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('list', () => {
-    it('should list all APIs with pagination', () => {
+    it('应该分页列出所有 API', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1'),
@@ -158,7 +158,7 @@ describe('ApiRegistry', () => {
       expect(result.items.length).toBe(2);
     });
 
-    it('should return correct page', () => {
+    it('应该返回正确的页码数据', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1'),
@@ -171,7 +171,7 @@ describe('ApiRegistry', () => {
       expect(result.items.length).toBe(1);
     });
 
-    it('should filter by tag', () => {
+    it('应该按标签过滤', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1', { tags: ['users'] }),
@@ -184,7 +184,7 @@ describe('ApiRegistry', () => {
       expect(result.total).toBe(2);
     });
 
-    it('should return empty for non-existent tag', () => {
+    it('不存在的标签应返回空结果', () => {
       const registry = new ApiRegistry();
       registry.register(createTestEntry('api1', { tags: ['users'] }));
 
@@ -196,7 +196,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('getDetail', () => {
-    it('should return API detail with schemas', () => {
+    it('应该返回包含 schema 的 API 详情', () => {
       const registry = new ApiRegistry();
       const entry = createTestEntry('test-api', {
         operation: {
@@ -234,7 +234,7 @@ describe('ApiRegistry', () => {
       expect(detail?.responseSchemas).toBeDefined();
     });
 
-    it('should preserve schema.required array and add bodyRequired in requestBodySchema', () => {
+    it('应保留 schema.required 数组并在 requestBodySchema 中添加 bodyRequired', () => {
       const registry = new ApiRegistry();
       const entry = createTestEntry('pet-api', {
         operation: {
@@ -274,7 +274,7 @@ describe('ApiRegistry', () => {
       expect(bodySchema.description).toBe('Pet object');
     });
 
-    it('should return undefined for non-existent API', () => {
+    it('不存在的 API 应返回 undefined', () => {
       const registry = new ApiRegistry();
 
       const detail = registry.getDetail('nonexistent');
@@ -284,7 +284,7 @@ describe('ApiRegistry', () => {
   });
 
   describe('getStats', () => {
-    it('should return registry statistics', () => {
+    it('应该返回注册表统计信息', () => {
       const registry = new ApiRegistry();
       registry.registerAll([
         createTestEntry('api1', { method: 'GET', tags: ['users'] }),
