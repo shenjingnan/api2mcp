@@ -18,16 +18,24 @@ const CONFIG_FILE_NAMES = ['api2mcp.json', 'api2mcp.config.json', '.api2mcp.json
 function parseHeaders(headersStr: string | undefined): Record<string, string> | undefined {
   if (!headersStr) return undefined;
 
+  // 1. 先尝试 JSON 格式
   try {
     const parsed = JSON.parse(headersStr);
     if (typeof parsed === 'object' && parsed !== null) {
       return parsed as Record<string, string>;
     }
     throw new Error('Headers must be a JSON object');
-  } catch (error) {
-    throw new ConfigurationError(
-      `Invalid headers JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  } catch (jsonError) {
+    // 2. JSON 失败，尝试 key=value 格式
+    try {
+      return parseKeyValueFormat(headersStr);
+    } catch {
+      throw new ConfigurationError(
+        `Invalid headers: expected JSON object or "key=value" format. ${
+          jsonError instanceof Error ? jsonError.message : 'Unknown error'
+        }`
+      );
+    }
   }
 }
 
