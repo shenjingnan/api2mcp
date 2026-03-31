@@ -69,3 +69,38 @@ describe('getBaseUrl', () => {
     expect(result).toBeUndefined();
   });
 });
+
+describe('x-fixed extension', () => {
+  it('should parse x-fixed: true from parameter', async () => {
+    const doc = await parseOpenApi('tests/fixtures/openapi/xfixed.json');
+    const getDataOp = doc.operations.find((op) => op.operationId === 'getData');
+    expect(getDataOp).toBeDefined();
+    expect(getDataOp?.parameters).toBeDefined();
+
+    const apiKeyParam = getDataOp?.parameters?.find((p) => p.name === 'apiKey');
+    expect(apiKeyParam).toBeDefined();
+    expect(apiKeyParam?.xFixed).toBe(true);
+
+    const pageParam = getDataOp?.parameters?.find((p) => p.name === 'page');
+    expect(pageParam).toBeDefined();
+    expect(pageParam?.xFixed).toBeUndefined();
+  });
+
+  it('should parse x-fixed for parameters across multiple operations', async () => {
+    const doc = await parseOpenApi('tests/fixtures/openapi/xfixed.json');
+    const getItemsOp = doc.operations.find((op) => op.operationId === 'getItems');
+    expect(getItemsOp).toBeDefined();
+
+    const apiKeyParam = getItemsOp?.parameters?.find((p) => p.name === 'apiKey');
+    expect(apiKeyParam?.xFixed).toBe(true);
+
+    const projectIdParam = getItemsOp?.parameters?.find((p) => p.name === 'projectId');
+    expect(projectIdParam?.xFixed).toBeUndefined();
+  });
+
+  it('should have xFixed as undefined when x-fixed is not present', async () => {
+    const doc = await parseOpenApi('tests/fixtures/openapi/minimal.json');
+    const getUsersOp = doc.operations.find((op) => op.operationId === 'getUsers');
+    expect(getUsersOp?.parameters).toBeUndefined();
+  });
+});
