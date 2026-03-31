@@ -4,8 +4,8 @@ info:
   version: "3.0"
   description: |
     高德地图 Web 服务 API，提供地理编码、POI 搜索、路径规划等功能。
-    本文档仅作 api2mcp 的 x-fixed 功能演示用途。
-    所有接口的 key 参数通过 x-fixed 标记，自动从环境变量注入，调用时无需手动传入。
+    本文档仅作 api2mcp 的 fixedParams 功能演示用途。
+    所有接口的 key 参数通过 API_FIXED_PARAMS 环境变量自动注入，调用时无需手动传入。
 
 servers:
   - url: https://restapi.amap.com
@@ -25,8 +25,7 @@ paths:
         - name: key
           in: query
           required: true
-          x-fixed: true
-          description: API 鉴权密钥（通过 x-fixed 从环境变量自动注入）
+          description: API 鉴权密钥（通过 API_FIXED_PARAMS 自动注入）
           schema:
             type: string
         - name: address
@@ -99,8 +98,7 @@ paths:
         - name: key
           in: query
           required: true
-          x-fixed: true
-          description: API 鉴权密钥（通过 x-fixed 从环境变量自动注入）
+          description: API 鉴权密钥（通过 API_FIXED_PARAMS 自动注入）
           schema:
             type: string
         - name: keywords
@@ -204,8 +202,7 @@ paths:
         - name: key
           in: query
           required: true
-          x-fixed: true
-          description: API 鉴权密钥（通过 x-fixed 从环境变量自动注入）
+          description: API 鉴权密钥（通过 API_FIXED_PARAMS 自动注入）
           schema:
             type: string
         - name: origin

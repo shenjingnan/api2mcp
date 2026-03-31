@@ -9,7 +9,6 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import type { Config } from '../config/types.js';
 import { generateTools } from '../converter/tool-generator.js';
 import { getBaseUrl, parseOpenApi } from '../parser/swagger.js';
-import type { OpenApiOperation } from '../parser/types.js';
 import { ApiRegistry } from '../registry/api-registry.js';
 import type { ApiEntry } from '../registry/types.js';
 import {
@@ -28,32 +27,6 @@ import {
 } from '../tools/discovery/index.js';
 import { logger } from '../utils/logger.js';
 import { ToolManager } from './tool-manager.js';
-
-/**
- * 从 OpenAPI 操作中提取 x-fixed 参数，从环境变量读取值
- */
-export function extractXFixedParams(
-  operations: OpenApiOperation[],
-  env: Record<string, string | undefined>
-): Record<string, string> {
-  const fixedParams: Record<string, string> = {};
-  const seen = new Set<string>();
-
-  for (const op of operations) {
-    if (op.parameters) {
-      for (const param of op.parameters) {
-        if (param.xFixed && !seen.has(param.name)) {
-          seen.add(param.name);
-          const value = env[param.name];
-          if (value !== undefined) {
-            fixedParams[param.name] = value;
-          }
-        }
-      }
-    }
-  }
-  return fixedParams;
-}
 
 /**
  * 创建 API Registry 并注册所有 API
@@ -156,13 +129,6 @@ export async function createServer(config: Config): Promise<McpServer> {
   // 解析 OpenAPI 文档
   const openApiDoc = await parseOpenApi(config.openapiUrl);
 
-  // 提取 x-fixed 参数，从 process.env 读取值，合并到 fixedParams
-  const xFixedParams = extractXFixedParams(
-    openApiDoc.operations,
-    process.env as Record<string, string | undefined>
-  );
-  const mergedFixedParams = { ...xFixedParams, ...config.fixedParams };
-
   // 获取基础 URL（可能为 undefined）
   const baseUrl = getBaseUrl(openApiDoc, config.baseUrl);
 
@@ -170,7 +136,7 @@ export async function createServer(config: Config): Promise<McpServer> {
   const effectiveConfig: Config = {
     ...config,
     baseUrl,
-    fixedParams: Object.keys(mergedFixedParams).length > 0 ? mergedFixedParams : undefined,
+    fixedParams: config.fixedParams,
   };
 
   // 生成工具（用于获取操作定义）

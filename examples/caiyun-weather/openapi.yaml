@@ -4,7 +4,7 @@ info:
   version: "2.6"
   description: |
     彩云天气 API 提供精准的天气预报服务。
-    本文档仅作 api2mcp 的 x-fixed 功能演示用途。
+    本文档仅作 api2mcp 的 fixedParams 功能演示用途。
 
 servers:
   - url: https://api.caiyunapp.com
@@ -21,8 +21,7 @@ paths:
         - name: appKey
           in: path
           required: true
-          x-fixed: true
-          description: API 鉴权密钥（通过 x-fixed 从环境变量自动注入）
+          description: API 鉴权密钥（通过 API_FIXED_PARAMS 自动注入）
           schema:
             type: string
         - name: location
@@ -113,8 +112,7 @@ paths:
         - name: appKey
           in: path
           required: true
-          x-fixed: true
-          description: API 鉴权密钥（通过 x-fixed 从环境变量自动注入）
+          description: API 鉴权密钥（通过 API_FIXED_PARAMS 自动注入）
           schema:
             type: string
         - name: location

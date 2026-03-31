@@ -174,68 +174,15 @@ LLM 调用流程:
 
 固定参数是一种特殊的参数，会在每次 API 请求中自动注入，但不会暴露给 LLM。适用于 API 密钥、Token 等敏感信息。
 
-#### 方式一：x-fixed 扩展字段（推荐）
+#### 配置方式
 
-在 OpenAPI 文档中为参数添加 `x-fixed: true` 扩展字段，系统会自动从**同名环境变量**读取值并注入到请求中。
-
-**1. 在 OpenAPI 文档中标记参数**
-
-```yaml
-paths:
-  /v3/geocode/geo:
-    get:
-      operationId: geocode
-      parameters:
-        - name: key           # 参数名
-          in: query
-          required: true
-          x-fixed: true       # 标记为固定参数
-          description: API 鉴权密钥
-          schema:
-            type: string
-        - name: address
-          in: query
-          required: true
-          description: 地址信息
-          schema:
-            type: string
-```
-
-**2. 在 MCP 客户端中通过环境变量传入值**
-
-环境变量名必须与参数的 `name` 一致。例如参数名为 `key`，则环境变量名为 `key`：
-
-```json
-{
-  "mcpServers": {
-    "my-api": {
-      "command": "npx",
-      "args": ["-y", "api2mcp", "--url", "https://api.example.com/openapi.json"],
-      "env": {
-        "key": "YOUR_API_KEY"
-      }
-    }
-  }
-}
-```
-
-> 完整示例参见 [`examples/amap-geo-assistant/`](examples/amap-geo-assistant/)。
-
-#### 方式二：外部配置
-
-不修改 OpenAPI 文档，通过外部配置传入固定参数：
+通过外部配置传入固定参数：
 
 - **CLI**: `--fixed-params 'key=YOUR_API_KEY'` 或 `--fixed-params '{"key":"YOUR_API_KEY"}'`
 - **环境变量**: `API_FIXED_PARAMS='key=YOUR_API_KEY'` 或 `API_FIXED_PARAMS='{"key":"YOUR_API_KEY"}'`
 - **配置文件**: `"fixedParams": {"key": "YOUR_API_KEY"}`
 
-#### 优先级与合并
-
-当同时使用 `x-fixed` 和外部配置时，合并策略如下：
-
-1. 首先提取所有 `x-fixed` 参数，从同名环境变量读取值作为基础
-2. 外部配置（CLI / 环境变量 `API_FIXED_PARAMS` / 配置文件 `fixedParams`）的值会覆盖 `x-fixed` 提取的值
-3. 外部配置之间仍遵循全局优先级：CLI > 环境变量 > 配置文件
+> 完整示例参见 [`examples/amap-geo-assistant/`](examples/amap-geo-assistant/) 和 [`examples/caiyun-weather/`](examples/caiyun-weather/)。
 
 ### 在 Claude Desktop 中使用
 
@@ -258,8 +205,6 @@ paths:
 > **注意**: 使用 `-y` 参数可以自动确认 npx 的安装提示，避免交互式确认。
 
 ### 使用环境变量传递敏感参数
-
-> **提示**: 如果 OpenAPI 文档支持 `x-fixed` 扩展字段，推荐使用上述[固定参数](#固定参数)的方式一，无需额外配置即可自动注入。以下方式适用于无法修改 OpenAPI 文档的场景。
 
 当 API 需要认证密钥等敏感参数时，推荐使用 MCP 客户端的 `env` 字段通过环境变量传递，而非 `--fixed-params` CLI 参数。这样可以避免密钥以明文形式出现在进程参数中（进程参数可通过 `ps` 等命令被其他用户查看）。
 
