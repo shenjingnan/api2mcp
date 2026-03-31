@@ -24,8 +24,8 @@ program
   .option('-t, --timeout <ms>', 'Request timeout in milliseconds', parseInt)
   .option('-h, --headers <json>', 'Custom headers as JSON string')
   .option(
-    '-f, --fixed-params <json>',
-    'Fixed parameters as JSON string (pre-filled, hidden from LLM)'
+    '-f, --fixed-params <params>',
+    'Fixed parameters as JSON string or key=value pairs (pre-filled, hidden from LLM)'
   )
   .option('-p, --prefix <prefix>', 'Tool name prefix')
   .option(
