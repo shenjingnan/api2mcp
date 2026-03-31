@@ -5,4 +5,7 @@ export default {
     () => 'pnpm spellcheck',
     () => 'pnpm test',
   ],
+  '*.{md,yaml,yml,json}': [
+    () => 'pnpm spellcheck',
+  ],
 };
