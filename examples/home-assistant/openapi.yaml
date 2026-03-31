@@ -1,0 +1,782 @@
+openapi: "3.0.0"
+info:
+  title: Home Assistant REST API
+  version: "2024.1"
+  description: |
+    Home Assistant 智能家居平台 REST API，提供设备状态查询、服务调用、事件触发等功能。
+    本文档仅作 api2mcp 的 API_HEADERS 功能演示用途。
+    所有接口的认证信息通过 API_HEADERS 环境变量自动注入，调用时无需手动传入。
+
+servers:
+  - url: http://localhost:8123
+
+tags:
+  - name: 系统管理
+    description: 系统配置与状态检查
+  - name: 实体状态
+    description: 实体状态的查询、更新与删除
+  - name: 服务调用
+    description: 调用 HA 服务控制设备
+  - name: 事件管理
+    description: 事件查询与触发
+  - name: 历史与日志
+    description: 历史状态与日志查询
+  - name: 日历
+    description: 日历实体与事件查询
+  - name: 摄像头
+    description: 摄像头图像获取
+  - name: 模板
+    description: Jinja2 模板渲染
+  - name: 意图
+    description: 意图处理
+
+paths:
+  /api/:
+    get:
+      operationId: getApiStatus
+      summary: 检查 API 运行状态
+      description: 返回 API 是否正常运行的消息。
+      tags:
+        - 系统管理
+      responses:
+        "200":
+          description: API 正常运行
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "API running."
+
+  /api/config:
+    get:
+      operationId: getConfig
+      summary: 获取系统配置
+      description: 返回 Home Assistant 的当前系统配置，包括已加载组件、位置信息、时区、单位系统等。
+      tags:
+        - 系统管理
+      responses:
+        "200":
+          description: 成功返回系统配置
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  components:
+                    type: array
+                    description: 已加载的组件列表
+                    items:
+                      type: string
+                  config_dir:
+                    type: string
+                    description: 配置文件目录路径
+                  elevation:
+                    type: integer
+                    description: 海拔高度
+                  latitude:
+                    type: number
+                    description: 纬度
+                  longitude:
+                    type: number
+                    description: 经度
+                  location_name:
+                    type: string
+                    description: 位置名称
+                  time_zone:
+                    type: string
+                    description: 时区
+                  unit_system:
+                    type: object
+                    description: 单位系统
+                    properties:
+                      length:
+                        type: string
+                      mass:
+                        type: string
+                      temperature:
+                        type: string
+                      volume:
+                        type: string
+                  version:
+                    type: string
+                    description: Home Assistant 版本号
+
+  /api/components:
+    get:
+      operationId: getComponents
+      summary: 获取已加载组件列表
+      description: 返回当前 Home Assistant 实例中已加载的所有组件列表。
+      tags:
+        - 系统管理
+      responses:
+        "200":
+          description: 成功返回组件列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "http"
+                  - "frontend"
+                  - "logger"
+                  - "automation"
+
+  /api/events:
+    get:
+      operationId: getEvents
+      summary: 获取事件列表
+      description: 返回所有事件类型及其监听器数量。
+      tags:
+        - 事件管理
+      responses:
+        "200":
+          description: 成功返回事件列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    event:
+                      type: string
+                      description: 事件名称
+                    listener_count:
+                      type: integer
+                      description: 监听器数量
+
+  /api/services:
+    get:
+      operationId: getServices
+      summary: 获取服务列表
+      description: 返回所有可用服务，按域（domain）分组列出每个域提供的服务。
+      tags:
+        - 服务调用
+      responses:
+        "200":
+          description: 成功返回服务列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    domain:
+                      type: string
+                      description: 服务域名称
+                    services:
+                      type: array
+                      description: 该域下的服务列表
+                      items:
+                        type: string
+
+  /api/history/period/{timestamp}:
+    get:
+      operationId: getHistoryPeriod
+      summary: 获取历史状态变更
+      description: |
+        返回指定时间段内的实体状态变更历史。
+        timestamp 为起始时间（格式 YYYY-MM-DDThh:mm:ssTZD），可选，默认为请求前 1 天。
+      tags:
+        - 历史与日志
+      parameters:
+        - name: timestamp
+          in: path
+          required: true
+          description: |
+            起始时间戳，格式为 `YYYY-MM-DDThh:mm:ssTZD`。
+            例如：`2023-09-04T00:00:00+02:00`
+          schema:
+            type: string
+        - name: filter_entity_id
+          in: query
+          required: true
+          description: |
+            要过滤的实体 ID，多个实体用逗号分隔。
+            例如：`sensor.temperature` 或 `sensor.temperature,sensor.humidity`
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          required: false
+          description: 结束时间戳（URL 编码格式），默认为 1 天
+          schema:
+            type: string
+        - name: minimal_response
+          in: query
+          required: false
+          description: 仅返回 last_changed 和 state（除首尾状态），速度更快
+          schema:
+            type: boolean
+            default: false
+        - name: no_attributes
+          in: query
+          required: false
+          description: 跳过返回属性数据，速度更快
+          schema:
+            type: boolean
+            default: false
+        - name: significant_changes_only
+          in: query
+          required: false
+          description: 仅返回显著的状态变更
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: 成功返回历史状态数据
+          content:
+            application/json:
+              schema:
+                type: array
+                description: 按实体分组的状态历史列表
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      entity_id:
+                        type: string
+                        description: 实体 ID
+                      state:
+                        type: string
+                        description: 实体状态值
+                      last_changed:
+                        type: string
+                        description: 最后变更时间
+                      last_updated:
+                        type: string
+                        description: 最后更新时间
+                      attributes:
+                        type: object
+                        description: 实体属性
+
+  /api/logbook/{timestamp}:
+    get:
+      operationId: getLogbook
+      summary: 获取日志簿条目
+      description: |
+        返回指定时间段的日志簿条目。
+        timestamp 为起始时间（格式 YYYY-MM-DDThh:mm:ssTZD），可选，默认为请求前 1 天。
+      tags:
+        - 历史与日志
+      parameters:
+        - name: timestamp
+          in: path
+          required: true
+          description: |
+            起始时间戳，格式为 `YYYY-MM-DDThh:mm:ssTZD`。
+            例如：`2024-01-01T00:00:00+08:00`
+          schema:
+            type: string
+        - name: entity
+          in: query
+          required: false
+          description: 过滤指定实体 ID 的日志条目
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          required: false
+          description: 结束时间戳（URL 编码格式）
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回日志簿条目
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    entity_id:
+                      type: string
+                      description: 实体 ID
+                    domain:
+                      type: string
+                      description: 所属域
+                    message:
+                      type: string
+                      description: 日志消息
+                    name:
+                      type: string
+                      description: 名称
+                    when:
+                      type: string
+                      description: 时间戳
+
+  /api/states:
+    get:
+      operationId: getStates
+      summary: 获取所有实体状态
+      description: 返回 Home Assistant 中所有实体的当前状态列表。
+      tags:
+        - 实体状态
+      responses:
+        "200":
+          description: 成功返回所有实体状态
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    entity_id:
+                      type: string
+                      description: 实体 ID
+                    state:
+                      type: string
+                      description: 实体状态值
+                    last_changed:
+                      type: string
+                      description: 最后变更时间
+                    last_updated:
+                      type: string
+                      description: 最后更新时间
+                    attributes:
+                      type: object
+                      description: 实体属性
+
+  /api/states/{entity_id}:
+    get:
+      operationId: getState
+      summary: 获取指定实体状态
+      description: 返回指定 entity_id 的实体状态。如果实体不存在则返回 404。
+      tags:
+        - 实体状态
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          description: |
+            实体 ID。
+            例如：`sensor.kitchen_temperature`、`light.study_light`、`switch.bedroom`
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回实体状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entity_id:
+                    type: string
+                    description: 实体 ID
+                  state:
+                    type: string
+                    description: 实体状态值
+                  last_changed:
+                    type: string
+                    description: 最后变更时间
+                  last_updated:
+                    type: string
+                    description: 最后更新时间
+                  attributes:
+                    type: object
+                    description: 实体属性
+        "404":
+          description: 实体不存在
+
+    post:
+      operationId: updateState
+      summary: 更新或创建实体状态
+      description: |
+        更新或创建指定实体的状态。可以创建任意状态，不要求实体在 Home Assistant 中实际存在。
+        注意：此端点仅设置 Home Assistant 中设备的表示，不会与实际设备通信。
+        要控制实际设备，请使用 POST /api/services/{domain}/{service} 端点。
+      tags:
+        - 实体状态
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          description: |
+            实体 ID。
+            例如：`sensor.kitchen_temperature`
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - state
+              properties:
+                state:
+                  type: string
+                  description: 实体的新状态值
+                attributes:
+                  type: object
+                  description: 实体的新属性（可选）
+            example:
+              state: "25"
+              attributes:
+                unit_of_measurement: "°C"
+      responses:
+        "200":
+          description: 实体已存在，状态已更新
+        "201":
+          description: 新实体已创建
+
+    delete:
+      operationId: deleteState
+      summary: 删除实体
+      description: 删除指定 entity_id 的实体。
+      tags:
+        - 实体状态
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          description: |
+            要删除的实体 ID。
+            例如：`sensor.kitchen_temperature`
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 实体已删除
+
+  /api/error_log:
+    get:
+      operationId: getErrorLog
+      summary: 获取错误日志
+      description: 返回 Home Assistant 当前会话期间记录的所有错误信息（纯文本格式）。
+      tags:
+        - 系统管理
+      responses:
+        "200":
+          description: 成功返回错误日志
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/camera_proxy/{camera_entity_id}:
+    get:
+      operationId: getCameraProxy
+      summary: 获取摄像头图像
+      description: 返回指定摄像头实体的最新图像。
+      tags:
+        - 摄像头
+      parameters:
+        - name: camera_entity_id
+          in: path
+          required: true
+          description: |
+            摄像头实体 ID。
+            例如：`camera.living_room`、`camera.front_door`
+          schema:
+            type: string
+        - name: time
+          in: query
+          required: false
+          description: 时间戳，用于获取指定时间的图像
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 成功返回摄像头图像
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+
+  /api/calendars:
+    get:
+      operationId: getCalendars
+      summary: 获取日历实体列表
+      description: 返回所有日历实体的列表。
+      tags:
+        - 日历
+      responses:
+        "200":
+          description: 成功返回日历列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    entity_id:
+                      type: string
+                      description: 日历实体 ID
+                    name:
+                      type: string
+                      description: 日历名称
+
+  /api/calendars/{calendar_entity_id}:
+    get:
+      operationId: getCalendarEvents
+      summary: 获取日历事件
+      description: 返回指定日历在指定时间范围内的事件列表。start 和 end 参数为必填。
+      tags:
+        - 日历
+      parameters:
+        - name: calendar_entity_id
+          in: path
+          required: true
+          description: |
+            日历实体 ID。
+            例如：`calendar.holidays`、`calendar.personal`
+          schema:
+            type: string
+        - name: start
+          in: query
+          required: true
+          description: 起始时间（ISO 8601 格式）
+          schema:
+            type: string
+            example: "2024-05-01T07:00:00.000Z"
+        - name: end
+          in: query
+          required: true
+          description: 结束时间（ISO 8601 格式）
+          schema:
+            type: string
+            example: "2024-06-12T07:00:00.000Z"
+      responses:
+        "200":
+          description: 成功返回日历事件
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    summary:
+                      type: string
+                      description: 事件摘要
+                    start:
+                      type: object
+                      description: 开始时间
+                      properties:
+                        date:
+                          type: string
+                          description: 全天事件的日期
+                        dateTime:
+                          type: string
+                          description: 定时事件的时间
+                    end:
+                      type: object
+                      description: 结束时间
+                      properties:
+                        date:
+                          type: string
+                          description: 全天事件的日期
+                        dateTime:
+                          type: string
+                          description: 定时事件的时间
+                    description:
+                      type: string
+                      description: 事件描述
+                    location:
+                      type: string
+                      description: 事件地点
+
+  /api/events/{event_type}:
+    post:
+      operationId: fireEvent
+      summary: 触发事件
+      description: |
+        触发指定类型的事件。可附带可选的 event_data JSON 对象。
+        请注意事件的数据结构需符合 HA 文档中的要求。
+      tags:
+        - 事件管理
+      parameters:
+        - name: event_type
+          in: path
+          required: true
+          description: |
+            事件类型名称。
+            例如：`custom_event`、`homeassistant_start`
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 事件数据（可选）
+              additionalProperties: true
+      responses:
+        "200":
+          description: 事件已触发
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 触发结果消息
+
+  /api/services/{domain}/{service}:
+    post:
+      operationId: callService
+      summary: 调用服务
+      description: |
+        调用指定域的服务。这是控制设备的主要方式。
+        例如：调用 `light.turn_on` 开灯、调用 `switch.toggle` 切换开关状态。
+        可附带可选的 service_data JSON 对象来指定目标实体或其他参数。
+        返回服务执行期间所有发生变化的状态列表。
+      tags:
+        - 服务调用
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          description: |
+            服务域名称。
+            例如：`light`、`switch`、`climate`、`media_player`
+          schema:
+            type: string
+        - name: service
+          in: path
+          required: true
+          description: |
+            服务名称。
+            例如：`turn_on`、`turn_off`、`toggle`
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 服务数据（可选，通常包含 entity_id）
+              properties:
+                entity_id:
+                  type: string
+                  description: 目标实体 ID
+              additionalProperties: true
+            example:
+              entity_id: "light.study_light"
+      responses:
+        "200":
+          description: 服务已执行，返回变更的状态列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    entity_id:
+                      type: string
+                    state:
+                      type: string
+                    last_changed:
+                      type: string
+                    attributes:
+                      type: object
+
+  /api/template:
+    post:
+      operationId: renderTemplate
+      summary: 渲染模板
+      description: |
+        渲染 Home Assistant Jinja2 模板并返回结果。
+        模板语法请参考 Home Assistant 官方文档。
+      tags:
+        - 模板
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - template
+              properties:
+                template:
+                  type: string
+                  description: |
+                    Jinja2 模板字符串。
+                    例如：`It is {{ now() }}!` 或 `Paulus is at {{ states('device_tracker.paulus') }}!`
+            example:
+              template: "It is {{ now() }}!"
+      responses:
+        "200":
+          description: 成功返回渲染结果
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/config/core/check_config:
+    post:
+      operationId: checkConfig
+      summary: 检查配置文件
+      description: |
+        触发 configuration.yaml 配置文件检查。
+        无需传入额外数据。需要启用 config 集成。
+      tags:
+        - 系统管理
+      responses:
+        "200":
+          description: 配置检查完成
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    nullable: true
+                    description: 错误信息（无错误时为 null）
+                  result:
+                    type: string
+                    description: 检查结果（"valid" 或 "invalid"）
+
+  /api/intent/handle:
+    post:
+      operationId: handleIntent
+      summary: 处理意图
+      description: |
+        处理一个意图请求。
+        需要在 configuration.yaml 中添加 `intent:` 集成才能启用此端点。
+      tags:
+        - 意图
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: 意图名称
+                data:
+                  type: object
+                  description: 意图数据
+                  additionalProperties: true
+            example:
+              name: "SetTimer"
+              data:
+                seconds: "30"
+      responses:
+        "200":
+          description: 意图已处理
