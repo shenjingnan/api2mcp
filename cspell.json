@@ -15,6 +15,7 @@
     "dailysteps",
     "geocode",
     "geocodes",
+    "homeassistant",
     "hourlysteps",
     "httpclient",
     "IPLP",
@@ -24,6 +25,8 @@
     "myapi",
     "ondemand",
     "openapi",
+    "paulus",
+    "Paulus",
     "petstore",
     "pname",
     "pois",
@@ -35,5 +38,11 @@
     "unmarshal",
     "zod"
   ],
-  "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.lock",
+    "pnpm-lock.yaml"
+  ]
 }
