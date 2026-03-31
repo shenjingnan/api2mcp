@@ -31,10 +31,55 @@ describe('config/loader', () => {
       expect(config.fixedParams).toBeUndefined();
     });
 
-    it('should throw error for invalid fixedParams JSON', () => {
+    it('should throw error for invalid fixedParams format', () => {
       expect(() =>
-        loadConfig({ url: 'test.json', fixedParams: 'not-json' }, {} as EnvConfig)
+        loadConfig({ url: 'test.json', fixedParams: 'not-valid' }, {} as EnvConfig)
       ).toThrow();
+    });
+
+    it('should parse single key=value format', () => {
+      const config = loadConfig(
+        { url: 'test.json', fixedParams: 'appKey=secret123' },
+        {} as EnvConfig
+      );
+
+      expect(config.fixedParams).toEqual({ appKey: 'secret123' });
+    });
+
+    it('should parse multiple key=value pairs', () => {
+      const config = loadConfig(
+        { url: 'test.json', fixedParams: 'appKey=xxx,token=yyy' },
+        {} as EnvConfig
+      );
+
+      expect(config.fixedParams).toEqual({ appKey: 'xxx', token: 'yyy' });
+    });
+
+    it('should parse key=value with spaces', () => {
+      const config = loadConfig(
+        { url: 'test.json', fixedParams: 'appKey = xxx , token = yyy' },
+        {} as EnvConfig
+      );
+
+      expect(config.fixedParams).toEqual({ appKey: 'xxx', token: 'yyy' });
+    });
+
+    it('should parse key=value where value contains equals sign', () => {
+      const config = loadConfig(
+        { url: 'test.json', fixedParams: 'token=abc=def' },
+        {} as EnvConfig
+      );
+
+      expect(config.fixedParams).toEqual({ token: 'abc=def' });
+    });
+
+    it('should parse key=value from env var', () => {
+      const config = loadConfig(
+        { url: 'test.json' },
+        { OPENAPI_URL: 'test.json', API_FIXED_PARAMS: 'appKey=env-key' }
+      );
+
+      expect(config.fixedParams).toEqual({ appKey: 'env-key' });
     });
 
     it('should prefer env fixedParams over CLI fixedParams (env takes precedence in merge order)', () => {

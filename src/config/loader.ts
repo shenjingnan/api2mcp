@@ -32,21 +32,56 @@ function parseHeaders(headersStr: string | undefined): Record<string, string> | 
 }
 
 /**
- * 解析 JSON 格式的固定参数字符串
+ * 解析 key=value 格式的字符串
+ */
+function parseKeyValueFormat(str: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const pairs = str.split(',');
+  for (const pair of pairs) {
+    const trimmed = pair.trim();
+    if (!trimmed) continue;
+    const eqIndex = trimmed.indexOf('=');
+    if (eqIndex === -1) {
+      throw new Error(`Invalid key=value pair: "${trimmed}"`);
+    }
+    const key = trimmed.substring(0, eqIndex).trim();
+    const value = trimmed.substring(eqIndex + 1).trim();
+    if (!key) {
+      throw new Error(`Empty key in pair: "${trimmed}"`);
+    }
+    result[key] = value;
+  }
+  if (Object.keys(result).length === 0) {
+    throw new Error('No valid key=value pairs found');
+  }
+  return result;
+}
+
+/**
+ * 解析固定参数字符串，支持 JSON 和 key=value 格式
  */
 function parseFixedParams(paramsStr: string | undefined): Record<string, string> | undefined {
   if (!paramsStr) return undefined;
 
+  // 1. 先尝试 JSON 格式
   try {
     const parsed = JSON.parse(paramsStr);
     if (typeof parsed === 'object' && parsed !== null) {
       return parsed as Record<string, string>;
     }
     throw new Error('Fixed params must be a JSON object');
-  } catch (error) {
-    throw new ConfigurationError(
-      `Invalid fixedParams JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  } catch (jsonError) {
+    // 2. JSON 失败，尝试 key=value 格式
+    try {
+      return parseKeyValueFormat(paramsStr);
+    } catch {
+      // 两种格式都失败，抛出错误
+      throw new ConfigurationError(
+        `Invalid fixedParams: expected JSON object or "key=value" format. ${
+          jsonError instanceof Error ? jsonError.message : 'Unknown error'
+        }`
+      );
+    }
   }
 }
 
