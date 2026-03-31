@@ -40,7 +40,7 @@
         "https://restapi.amap.com"
       ],
       "env": {
-        "API_FIXED_PARAMS": "{\"key\":\"YOUR_AMAP_KEY\"}"
+        "API_FIXED_PARAMS": "key=YOUR_AMAP_KEY"
       }
     }
   }

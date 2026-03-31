@@ -2,6 +2,12 @@
 
 本文档记录项目的所有重要变更。
 
+# [Unreleased]
+
+### Breaking Changes
+
+* **parser:** 移除 `x-fixed` OpenAPI 扩展字段支持，统一使用 `API_FIXED_PARAMS` 环境变量或 `--fixed-params` CLI 参数配置固定参数
+
 # [0.6.0](https://github.com/shenjingnan/api2mcp/compare/v0.5.0...v0.6.0) (2026-03-29)
 
 

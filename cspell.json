@@ -33,7 +33,6 @@
     "swagger",
     "tsup",
     "unmarshal",
-    "xfixed",
     "zod"
   ],
   "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]

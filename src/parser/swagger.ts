@@ -33,7 +33,6 @@ function convertParameter(param: OpenAPIV3.ParameterObject): OpenApiParameter {
     description: param.description,
     schema: param.schema as OpenApiSchema | undefined,
     deprecated: param.deprecated,
-    xFixed: 'x-fixed' in param ? (param as Record<string, unknown>)['x-fixed'] === true : undefined,
   };
 }
 
