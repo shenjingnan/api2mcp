@@ -4,7 +4,7 @@ import type { EnvConfig } from '../../src/config/types.js';
 
 describe('config/loader', () => {
   describe('fixedParams', () => {
-    it('should load fixedParams from CLI args', () => {
+    it('应从 CLI 参数加载 fixedParams', () => {
       const config = loadConfig(
         {
           url: 'test.json',
@@ -16,7 +16,7 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ appKey: 'secret123' });
     });
 
-    it('should load fixedParams from env var', () => {
+    it('应从环境变量加载 fixedParams', () => {
       const config = loadConfig(
         { url: 'test.json' },
         { OPENAPI_URL: 'test.json', API_FIXED_PARAMS: '{"token":"abc"}' }
@@ -25,19 +25,19 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ token: 'abc' });
     });
 
-    it('should return undefined fixedParams when not configured', () => {
+    it('未配置 fixedParams 时应返回 undefined', () => {
       const config = loadConfig({ url: 'test.json' }, {} as EnvConfig);
 
       expect(config.fixedParams).toBeUndefined();
     });
 
-    it('should throw error for invalid fixedParams format', () => {
+    it('fixedParams 格式无效时应抛出错误', () => {
       expect(() =>
         loadConfig({ url: 'test.json', fixedParams: 'not-valid' }, {} as EnvConfig)
       ).toThrow();
     });
 
-    it('should parse single key=value format', () => {
+    it('应解析单个 key=value 格式', () => {
       const config = loadConfig(
         { url: 'test.json', fixedParams: 'appKey=secret123' },
         {} as EnvConfig
@@ -46,7 +46,7 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ appKey: 'secret123' });
     });
 
-    it('should parse multiple key=value pairs', () => {
+    it('应解析多个 key=value 键值对', () => {
       const config = loadConfig(
         { url: 'test.json', fixedParams: 'appKey=xxx,token=yyy' },
         {} as EnvConfig
@@ -55,7 +55,7 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ appKey: 'xxx', token: 'yyy' });
     });
 
-    it('should parse key=value with spaces', () => {
+    it('应解析带空格的 key=value 格式', () => {
       const config = loadConfig(
         { url: 'test.json', fixedParams: 'appKey = xxx , token = yyy' },
         {} as EnvConfig
@@ -64,7 +64,7 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ appKey: 'xxx', token: 'yyy' });
     });
 
-    it('should parse key=value where value contains equals sign', () => {
+    it('应解析值中包含等号的 key=value 格式', () => {
       const config = loadConfig(
         { url: 'test.json', fixedParams: 'token=abc=def' },
         {} as EnvConfig
@@ -73,7 +73,7 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ token: 'abc=def' });
     });
 
-    it('should parse key=value from env var', () => {
+    it('应从环境变量解析 key=value 格式', () => {
       const config = loadConfig(
         { url: 'test.json' },
         { OPENAPI_URL: 'test.json', API_FIXED_PARAMS: 'appKey=env-key' }
@@ -82,14 +82,14 @@ describe('config/loader', () => {
       expect(config.fixedParams).toEqual({ appKey: 'env-key' });
     });
 
-    it('should prefer env fixedParams over CLI fixedParams (env takes precedence in merge order)', () => {
+    it('环境变量 fixedParams 应优先于 CLI fixedParams（合并顺序中后者覆盖前者）', () => {
       const config = loadConfig(
         { url: 'test.json', fixedParams: '{"appKey":"cli-key"}' },
         { OPENAPI_URL: 'test.json', API_FIXED_PARAMS: '{"appKey":"env-key"}' }
       );
 
-      // mergeConfigs(cliConfig, envConfig, fileConfig) - later overrides earlier
-      // so env overrides CLI
+      // mergeConfigs(cliConfig, envConfig, fileConfig) - 后者覆盖前者
+      // 因此 env 覆盖 CLI
       expect(config.fixedParams).toEqual({ appKey: 'env-key' });
     });
   });
