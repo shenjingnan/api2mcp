@@ -2,6 +2,35 @@
 
 本文档记录项目的所有重要变更。
 
+# [0.7.0](https://github.com/shenjingnan/api2mcp/compare/v0.6.0...v0.7.0) (2026-04-04)
+
+
+### Bug Fixes
+
+* **lint:** 统一 spellcheck 在 commit lint 和 CI 中的行为 ([#39](https://github.com/shenjingnan/api2mcp/issues/39)) ([5277007](https://github.com/shenjingnan/api2mcp/commit/5277007f05a20e2d6ebdde4add962aaf51d44a11))
+
+
+### Code Refactoring
+
+* 移除 x-fixed 扩展字段，统一使用 API_FIXED_PARAMS ([#34](https://github.com/shenjingnan/api2mcp/issues/34)) ([bef8310](https://github.com/shenjingnan/api2mcp/commit/bef8310c94eadef28c454c6625a508f0bb92069c)), closes [#32](https://github.com/shenjingnan/api2mcp/issues/32)
+
+
+### Features
+
+* **config:** headers 支持 key=value 格式解析 ([#37](https://github.com/shenjingnan/api2mcp/issues/37)) ([f880350](https://github.com/shenjingnan/api2mcp/commit/f88035034ba720fe530433466978c9504a876420))
+* **config:** 支持 key=value 格式的固定参数解析 ([#33](https://github.com/shenjingnan/api2mcp/issues/33)) ([1da4f9e](https://github.com/shenjingnan/api2mcp/commit/1da4f9e5f702631cbf4a438f3efd6d83b9d7863d))
+* **examples:** 添加高德地图地理编码助手示例配置 ([#30](https://github.com/shenjingnan/api2mcp/issues/30)) ([6d24721](https://github.com/shenjingnan/api2mcp/commit/6d24721c6d159843897102c4ef808aff33fa2e3c))
+* 支持 OpenAPI x-fixed 扩展字段替代 API_FIXED_PARAMS ([#32](https://github.com/shenjingnan/api2mcp/issues/32)) ([8b98405](https://github.com/shenjingnan/api2mcp/commit/8b984056783dcb0b8401bdfbea06b617cd0f06a8))
+
+
+### BREAKING CHANGES
+
+* 不再支持 OpenAPI x-fixed 扩展字段，请使用 API_FIXED_PARAMS 环境变量或 --fixed-params CLI 参数替代
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-authored-by: GLM-5.1 <noreply@bigmodel.cn>
+
 # [Unreleased]
 
 ### Breaking Changes
