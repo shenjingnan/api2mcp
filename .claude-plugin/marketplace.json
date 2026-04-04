@@ -1,0 +1,19 @@
+{
+  "name": "api2mcp-plugins",
+  "owner": {
+    "name": "shenjingnan",
+    "email": "sjn.code@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "api2mcp",
+      "source": "./plugin",
+      "description": "AI 辅助将 REST API 转换为 MCP 工具，支持生成 openapi.yaml 和 mcp.json 配置",
+      "version": "0.1.0",
+      "author": {
+        "name": "shenjingnan",
+        "email": "sjn.code@gmail.com"
+      }
+    }
+  ]
+}
