@@ -21,6 +21,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "release": "release-it",
+    "release:dry": "release-it --dry-run --ci",
     "release:beta": "release-it --preRelease=beta --ci",
     "release:patch": "release-it patch --ci",
     "release:minor": "release-it minor --ci",
