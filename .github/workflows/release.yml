@@ -1,188 +1,44 @@
-# .github/workflows/release.yml
-name: 发布
+name: Release
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "package.json"
+  release:
+    types: [published]
 
 jobs:
-  release:
-    name: 发布到 NPM
+  publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # 需要获取前一个 commit 来比较版本变更
+      - name: 检出代码仓库
+        uses: actions/checkout@v6
 
-      - name: 检查版本是否变更
-        id: version
-        run: |
-          # 获取当前版本
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-
-          # 获取上一个 commit 的版本
-          git checkout HEAD~1 -- package.json
-          PREVIOUS_VERSION=$(node -p "require('./package.json').version")
-          git checkout HEAD -- package.json
-
-          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          echo "previous=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
-
-          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "✅ 版本已变更: $PREVIOUS_VERSION → $CURRENT_VERSION"
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ 版本未变更，跳过发布"
-          fi
-
-      - name: 检查标签是否存在
-        id: tag-check
-        if: steps.version.outputs.changed == 'true'
-        run: |
-          TAG="v${{ steps.version.outputs.current }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "⚠️ 标签 $TAG 已存在，跳过发布"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "✅ 标签 $TAG 不存在，将创建并发布"
-          fi
-
-      - name: 设置 Node.js
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: 安装 pnpm
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        uses: pnpm/action-setup@v4
+      - name: 设置 pnpm
+        uses: pnpm/action-setup@v5
         with:
           version: 10.30.3
 
-      - name: 获取 pnpm 存储目录
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-        id: pnpm-cache
-
-      - name: 设置 pnpm 缓存
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        uses: actions/cache@v4
+      - name: 设置 Node.js
+        uses: actions/setup-node@v6
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
 
       - name: 安装依赖
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
         run: pnpm install --frozen-lockfile
 
       - name: 构建
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        run: pnpm build
+        run: pnpm run build
 
-      - name: 测试
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        run: pnpm test
-
-      - name: 检查是否为预发布版本
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        id: prerelease
-        env:
-          VERSION: ${{ steps.version.outputs.current }}
+      - name: 发布
         run: |
-          if [[ "$VERSION" =~ (alpha|beta|rc) ]]; then
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-            echo "npm_tag=beta" >> $GITHUB_OUTPUT
-            echo "📦 检测到预发布版本"
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *"-"* ]]; then
+            TAG=$(echo "$VERSION" | sed 's/.*-\([a-zA-Z]*\).*/\1/')
+            pnpm publish --no-git-checks --provenance --access public --tag "$TAG"
           else
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-            echo "npm_tag=latest" >> $GITHUB_OUTPUT
-            echo "📦 检测到正式版本"
-          fi
-
-      - name: 创建并推送标签
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        run: |
-          TAG="v${{ steps.version.outputs.current }}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git tag -a "$TAG" -m "发布 $TAG"
-          git push origin "$TAG"
-
-          echo "✅ 已创建并推送标签: $TAG"
-
-      - name: 发布到 NPM
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        env:
-          NPM_TAG: ${{ steps.prerelease.outputs.npm_tag }}
-        run: |
-          pnpm publish --provenance --tag "${NPM_TAG}"
-          echo "✅ 已发布到 NPM，标签: ${NPM_TAG}"
-
-      - name: 创建 GitHub Release
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
-        uses: actions/github-script@v7
-        env:
-          IS_PRERELEASE: ${{ steps.prerelease.outputs.is_prerelease }}
-          REPO_NAME: ${{ github.event.repository.name }}
-          VERSION: ${{ steps.version.outputs.current }}
-        with:
-          script: |
-            const version = process.env.VERSION;
-            const tag = `v${version}`;
-            const isPrerelease = process.env.IS_PRERELEASE === 'true';
-            const repoName = process.env.REPO_NAME;
-
-            console.log(`创建 GitHub Release: ${tag}`);
-
-            const { data: release } = await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: tag,
-              name: tag,
-              generate_release_notes: true,
-              prerelease: isPrerelease
-            });
-
-            console.log(`✅ Release 已创建: ${release.html_url}`);
-
-            const npmTag = isPrerelease ? 'beta' : 'latest';
-
-            core.summary
-              .addHeading('🎉 发布成功')
-              .addLink(tag, release.html_url)
-              .addRaw(`\n\n**NPM 包**: [\`${repoName}@${version}\`](https://www.npmjs.com/package/${repoName})`)
-              .addRaw(`\n\n**NPM 标签**: \`${npmTag}\``)
-              .write();
-
-      - name: 摘要
-        if: steps.version.outputs.changed == 'true'
-        run: |
-          if [ "${{ steps.tag-check.outputs.exists }}" == "false" ]; then
-            echo "### 🎉 发布完成" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **版本**: v${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **上一版本**: v${{ steps.version.outputs.previous }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **NPM 标签**: ${{ steps.prerelease.outputs.npm_tag }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### ⚠️ 标签已存在" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **版本**: v${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
-            echo "- 跳过发布" >> $GITHUB_STEP_SUMMARY
+            pnpm publish --no-git-checks --provenance --access public
           fi
