@@ -246,11 +246,11 @@ function convertObjectSchema(schema: OpenApiSchema, refResolver: RefResolver): z
     // 空 object 或 additionalProperties
     if (schema.additionalProperties) {
       if (typeof schema.additionalProperties === 'boolean') {
-        return z.record(z.unknown());
+        return z.record(z.string(), z.unknown());
       }
-      return z.record(convertSchema(schema.additionalProperties, refResolver));
+      return z.record(z.string(), convertSchema(schema.additionalProperties, refResolver));
     }
-    return z.record(z.unknown());
+    return z.record(z.string(), z.unknown());
   }
 
   const zodProperties: Record<string, z.ZodType> = {};

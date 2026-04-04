@@ -15,7 +15,10 @@ import { logger } from '../../utils/logger.js';
  */
 export const apiExecuteSchema = z.object({
   operationId: z.string().min(1).describe('API ID（operationId 或工具名称）'),
-  parameters: z.record(z.unknown()).optional().describe('API 参数（路径参数、查询参数、请求体等）'),
+  parameters: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe('API 参数（路径参数、查询参数、请求体等）'),
   _baseUrl: z.string().url().optional().describe('API base URL（可选，覆盖默认配置）'),
 });
 

@@ -16,7 +16,7 @@ export interface GeneratedTool {
   /** 工具描述 */
   description: string;
   /** 输入参数 Schema */
-  inputSchema: z.ZodObject<z.ZodRawShape>;
+  inputSchema: z.ZodObject<Record<string, z.ZodType>>;
   /** 原始操作定义 */
   operation: OpenApiOperation;
 }
@@ -89,8 +89,8 @@ function buildParametersSchema(
   operation: OpenApiOperation,
   refResolver: ReturnType<typeof createRefResolver>,
   fixedParams?: Record<string, string>
-): z.ZodRawShape {
-  const shape: z.ZodRawShape = {};
+): Record<string, z.ZodType> {
+  const shape: Record<string, z.ZodType> = {};
 
   // 处理路径参数、查询参数、头参数
   if (operation.parameters) {
@@ -110,7 +110,7 @@ function buildParametersSchema(
 
       // 处理可选参数
       if (!param.required) {
-        paramSchema = paramSchema.optional();
+        paramSchema = z.optional(paramSchema);
       }
 
       // 使用参数名作为键，添加位置信息
@@ -133,7 +133,7 @@ function buildParametersSchema(
       }
 
       if (!operation.requestBody.required) {
-        shape.body = shape.body.optional();
+        shape.body = z.optional(shape.body);
       }
     } else {
       // 尝试其他内容类型
@@ -145,7 +145,7 @@ function buildParametersSchema(
           shape.body = bodySchema.describe(`Request body (${contentTypes[0]})`);
 
           if (!operation.requestBody.required) {
-            shape.body = shape.body.optional();
+            shape.body = z.optional(shape.body);
           }
         }
       }
