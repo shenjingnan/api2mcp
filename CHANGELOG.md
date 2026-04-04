@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.2](https://github.com/shenjingnan/api2mcp/compare/v0.7.1...v0.7.2) (2026-04-04)
+
+### Code Refactoring
+
+* 将 Claude Code 配置迁移至 AGENTS.md 并重组目录结构 ([#54](https://github.com/shenjingnan/api2mcp/issues/54)) ([38f52a2](https://github.com/shenjingnan/api2mcp/commit/38f52a297f71ba9459ac5e53b8e410ed3f1fad62))
+
+### Documentation
+
+* 添加项目 CLAUDE.md 指导文件 ([#53](https://github.com/shenjingnan/api2mcp/issues/53)) ([b4dc80b](https://github.com/shenjingnan/api2mcp/commit/b4dc80b1983dd990bde42a702fe40bacdcd10fe7))
+
 ## [0.7.1](https://github.com/shenjingnan/api2mcp/compare/v0.7.0...v0.7.1) (2026-04-04)
 
 ### Code Refactoring
