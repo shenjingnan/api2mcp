@@ -135,8 +135,3 @@ export interface RegistryStats {
   /** 按标签统计 */
   byTag: Record<string, number>;
 }
-
-/**
- * 工作模式
- */
-export type Mode = 'default' | 'ondemand';

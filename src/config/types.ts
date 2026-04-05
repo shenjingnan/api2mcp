@@ -10,6 +10,12 @@ import { z } from 'zod';
 export type ApiHeaders = Record<string, string>;
 
 /**
+ * 安全凭据配置
+ * key 为安全方案名称，value 为凭据（如 token、API key 等）
+ */
+export type SecurityCredentials = Record<string, string>;
+
+/**
  * 工作模式
  */
 export type Mode = 'default' | 'ondemand';
@@ -40,6 +46,8 @@ export interface ApiSourceConfig {
 export interface Config extends ApiSourceConfig {
   /** 调试模式 */
   debug: boolean;
+  /** 安全凭据 */
+  security?: SecurityCredentials;
 }
 
 /**
@@ -54,6 +62,7 @@ export const CliArgsSchema = z.object({
   prefix: z.string().optional(),
   debug: z.boolean().optional(),
   mode: z.enum(['default', 'ondemand']).optional(),
+  security: z.string().optional(),
 });
 
 export type CliArgs = z.infer<typeof CliArgsSchema>;
@@ -67,6 +76,7 @@ export interface EnvConfig {
   API_TIMEOUT?: string;
   API_HEADERS?: string;
   API_FIXED_PARAMS?: string;
+  API_SECURITY?: string;
   DEBUG?: string;
 }
 
@@ -82,6 +92,7 @@ export const ConfigFileSchema = z.object({
   toolPrefix: z.string().optional(),
   debug: z.boolean().optional(),
   mode: z.enum(['default', 'ondemand']).optional(),
+  security: z.record(z.string(), z.string()).optional(),
 });
 
 export type ConfigFile = z.infer<typeof ConfigFileSchema>;

@@ -5,7 +5,8 @@
 
 import { z } from 'zod';
 import type { Config } from '../../config/types.js';
-import { executeRequest, formatResponse } from '../../executor/http-client.js';
+import { executeOperation } from '../../executor/operation-executor.js';
+import type { SecurityRequirement, SecurityScheme } from '../../parser/types.js';
 import type { ApiRegistry } from '../../registry/api-registry.js';
 import { ToolExecutionError } from '../../utils/error.js';
 import { logger } from '../../utils/logger.js';
@@ -55,7 +56,9 @@ export const apiExecuteTool = {
 export async function executeApiExecute(
   registry: ApiRegistry,
   config: Config,
-  input: ApiExecuteInput
+  input: ApiExecuteInput,
+  securitySchemes?: Record<string, SecurityScheme>,
+  globalSecurity?: SecurityRequirement[]
 ): Promise<string> {
   const { operationId, parameters = {}, _baseUrl } = input;
 
@@ -98,8 +101,13 @@ export async function executeApiExecute(
     logger.info(`Executing API: ${apiEntry.method} ${apiEntry.path}`);
 
     // 执行请求
-    const response = await executeRequest(apiEntry.operation, parameters, executionConfig);
-    const formattedResponse = formatResponse(response);
+    const formattedResponse = await executeOperation({
+      operation: apiEntry.operation,
+      input: parameters,
+      config: executionConfig,
+      securitySchemes,
+      globalSecurity,
+    });
 
     return formattedResponse;
   } catch (error) {

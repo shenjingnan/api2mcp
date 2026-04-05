@@ -9,6 +9,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import type { Config } from '../config/types.js';
 import { generateTools } from '../converter/tool-generator.js';
 import { getBaseUrl, parseOpenApi } from '../parser/swagger.js';
+import type { SecurityRequirement, SecurityScheme } from '../parser/types.js';
 import { ApiRegistry } from '../registry/api-registry.js';
 import type { ApiEntry } from '../registry/types.js';
 import {
@@ -61,7 +62,13 @@ function createRegistry(
 /**
  * 注册按需模式的 discovery tools
  */
-function registerOndemandTools(server: McpServer, registry: ApiRegistry, config: Config): void {
+function registerOndemandTools(
+  server: McpServer,
+  registry: ApiRegistry,
+  config: Config,
+  securitySchemes?: Record<string, SecurityScheme>,
+  globalSecurity?: SecurityRequirement[]
+): void {
   // api_list
   server.tool(
     apiListTool.name,
@@ -104,7 +111,9 @@ function registerOndemandTools(server: McpServer, registry: ApiRegistry, config:
       const result = await executeApiExecute(
         registry,
         config,
-        args as Parameters<typeof executeApiExecute>[2]
+        args as Parameters<typeof executeApiExecute>[2],
+        securitySchemes,
+        globalSecurity
       );
       return { content: [{ type: 'text', text: result }] };
     }
@@ -151,14 +160,25 @@ export async function createServer(config: Config): Promise<McpServer> {
   if (config.mode === 'ondemand') {
     // 按需模式：创建 Registry，注册 discovery tools
     const registry = createRegistry(tools, openApiDoc.components?.schemas);
-    registerOndemandTools(server, registry, effectiveConfig);
+    registerOndemandTools(
+      server,
+      registry,
+      effectiveConfig,
+      openApiDoc.securitySchemes,
+      openApiDoc.security
+    );
 
     const stats = registry.getStats();
     logger.info(`Server ready with ${stats.totalApis} APIs in registry`);
     logger.info(`Tags: ${stats.tags.slice(0, 5).join(', ')}${stats.tags.length > 5 ? '...' : ''}`);
   } else {
     // 默认模式：直接注册所有工具
-    const toolManager = new ToolManager(server, effectiveConfig);
+    const toolManager = new ToolManager(
+      server,
+      effectiveConfig,
+      openApiDoc.securitySchemes,
+      openApiDoc.security
+    );
     toolManager.registerTools(tools);
 
     logger.info(`Server ready with ${toolManager.getToolCount()} tools`);

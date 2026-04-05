@@ -94,6 +94,33 @@ function parseFixedParams(paramsStr: string | undefined): Record<string, string>
 }
 
 /**
+ * 解析安全凭据字符串，支持 JSON 和 key=value 格式
+ */
+function parseSecurity(securityStr: string | undefined): Record<string, string> | undefined {
+  if (!securityStr) return undefined;
+
+  // 1. 先尝试 JSON 格式
+  try {
+    const parsed = JSON.parse(securityStr);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed as Record<string, string>;
+    }
+    throw new Error('Security must be a JSON object');
+  } catch (jsonError) {
+    // 2. JSON 失败，尝试 key=value 格式
+    try {
+      return parseKeyValueFormat(securityStr);
+    } catch {
+      throw new ConfigurationError(
+        `Invalid security: expected JSON object or "key=value" format. ${
+          jsonError instanceof Error ? jsonError.message : 'Unknown error'
+        }`
+      );
+    }
+  }
+}
+
+/**
  * 从环境变量加载配置
  */
 function loadFromEnv(env: EnvConfig): Partial<Config> {
@@ -120,6 +147,10 @@ function loadFromEnv(env: EnvConfig): Partial<Config> {
 
   if (env.API_FIXED_PARAMS) {
     config.fixedParams = parseFixedParams(env.API_FIXED_PARAMS);
+  }
+
+  if (env.API_SECURITY) {
+    config.security = parseSecurity(env.API_SECURITY);
   }
 
   if (env.DEBUG) {
@@ -149,6 +180,7 @@ function loadFromFile(workingDir: string = process.cwd()): Partial<Config> | nul
           toolPrefix: parsed.toolPrefix,
           debug: parsed.debug,
           mode: parsed.mode,
+          security: parsed.security,
         };
       } catch (error) {
         throw new ConfigurationError(
@@ -200,6 +232,10 @@ function loadFromCli(args: CliArgs): Partial<Config> {
     config.mode = args.mode;
   }
 
+  if (args.security) {
+    config.security = parseSecurity(args.security);
+  }
+
   return config;
 }
 
@@ -221,6 +257,7 @@ function mergeConfigs(...configs: Array<Partial<Config>>): Config {
     if (config.toolPrefix !== undefined) merged.toolPrefix = config.toolPrefix;
     if (config.debug !== undefined) merged.debug = config.debug;
     if (config.mode !== undefined) merged.mode = config.mode;
+    if (config.security !== undefined) merged.security = config.security;
   }
 
   // 设置默认值

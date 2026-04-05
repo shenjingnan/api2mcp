@@ -2,6 +2,7 @@
  * Registry 模块导出
  */
 
+export type { Mode } from '../config/types.js';
 export { ApiRegistry } from './api-registry.js';
 export type {
   ApiDetail,
@@ -9,7 +10,6 @@ export type {
   ListItem,
   ListOptions,
   ListResult,
-  Mode,
   RegistryStats,
   SearchOptions,
   SearchResultItem,

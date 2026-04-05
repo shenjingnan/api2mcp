@@ -3,6 +3,7 @@
  */
 
 import type { OpenApiOperation, OpenApiParameter, ParameterLocation } from '../parser/types.js';
+import type { ResolvedAuthentication } from '../security/types.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -48,7 +49,8 @@ export function buildRequest(
   operation: OpenApiOperation,
   input: Record<string, unknown>,
   defaultHeaders: Record<string, string> = {},
-  fixedParams: Record<string, string> = {}
+  fixedParams: Record<string, string> = {},
+  auth?: ResolvedAuthentication
 ): BuiltRequest {
   const groupedParams = groupParametersByLocation(operation.parameters);
 
@@ -65,6 +67,12 @@ export function buildRequest(
 
   // 构建查询参数
   const query: Record<string, string | string[]> = {};
+  // 注入认证查询参数
+  if (auth?.query) {
+    for (const [key, value] of Object.entries(auth.query)) {
+      query[key] = value;
+    }
+  }
   for (const param of groupedParams.query) {
     const value = input[param.name] ?? fixedParams[param.name];
     if (value !== undefined) {
@@ -78,8 +86,12 @@ export function buildRequest(
     }
   }
 
-  // 构建请求头
+  // 构建请求头（合并顺序：defaultHeaders → auth.headers → 操作参数 headers）
   const headers: Record<string, string> = { ...defaultHeaders };
+  // 注入认证头
+  if (auth?.headers) {
+    Object.assign(headers, auth.headers);
+  }
   for (const param of groupedParams.header) {
     const value = input[param.name] ?? fixedParams[param.name];
     if (value !== undefined) {

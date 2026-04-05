@@ -33,6 +33,10 @@ program
     'Working mode: default (all APIs as tools) or ondemand (discovery tools)',
     'default'
   )
+  .option(
+    '-s, --security <credentials>',
+    'Security credentials as JSON or key=value pairs (e.g. \'{"bearerAuth":"token123"}\' or bearerAuth=token123)'
+  )
   .option('-d, --debug', 'Enable debug mode', false)
   .action(async (options) => {
     let config: Config | undefined;
@@ -46,6 +50,7 @@ program
         fixedParams: options.fixedParams,
         prefix: options.prefix,
         mode: options.mode,
+        security: options.security,
         debug: options.debug,
       });
 
