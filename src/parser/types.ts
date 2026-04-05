@@ -8,6 +8,46 @@
 export type ParameterLocation = 'path' | 'query' | 'header' | 'cookie';
 
 /**
+ * API Key 位置
+ */
+export type ApiKeyLocation = 'query' | 'header' | 'cookie';
+
+/**
+ * 安全方案类型
+ */
+export type SecuritySchemeType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
+
+/**
+ * 安全方案定义
+ */
+export interface SecurityScheme {
+  /** 安全方案类型 */
+  type: SecuritySchemeType;
+  /** 方案描述 */
+  description?: string;
+  /** API Key 的位置（apiKey 类型） */
+  in?: ApiKeyLocation;
+  /** API Key 的字段名（apiKey 类型） */
+  name?: string;
+  /** HTTP 认证方案（http 类型），如 basic、bearer */
+  scheme?: string;
+  /** Bearer Token 格式（http/bearer 类型） */
+  bearerFormat?: string;
+  /** OAuth2 流程配置（oauth2 类型） */
+  flows?: Record<string, unknown>;
+  /** OpenID Connect URL（openIdConnect 类型） */
+  openIdConnectUrl?: string;
+}
+
+/**
+ * 安全需求
+ */
+export interface SecurityRequirement {
+  /** 安全方案名称到所需 scope 的映射 */
+  [schemeName: string]: string[];
+}
+
+/**
  * OpenAPI 参数
  */
 export interface OpenApiParameter {
@@ -104,6 +144,8 @@ export interface OpenApiOperation {
   requestBody?: OpenApiRequestBody;
   /** 响应 */
   responses?: Record<string, OpenApiResponse>;
+  /** 操作级安全需求 */
+  security?: SecurityRequirement[];
   /** 是否废弃 */
   deprecated?: boolean;
 }
@@ -141,6 +183,10 @@ export interface ParsedOpenApiDoc {
   info: OpenApiInfo;
   servers?: OpenApiServer[];
   operations: OpenApiOperation[];
+  /** 安全方案定义 */
+  securitySchemes?: Record<string, SecurityScheme>;
+  /** 全局安全需求 */
+  security?: SecurityRequirement[];
   components?: {
     schemas?: Record<string, OpenApiSchema>;
     parameters?: Record<string, OpenApiParameter>;

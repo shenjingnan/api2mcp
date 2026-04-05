@@ -5,8 +5,8 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Config } from '../config/types.js';
 import type { GeneratedTool } from '../converter/tool-generator.js';
-import { executeRequest, formatResponse } from '../executor/http-client.js';
-import type { OpenApiOperation } from '../parser/types.js';
+import { executeOperation } from '../executor/operation-executor.js';
+import type { SecurityRequirement, SecurityScheme } from '../parser/types.js';
 import { ToolExecutionError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
 
@@ -17,10 +17,19 @@ export class ToolManager {
   private tools: Map<string, GeneratedTool> = new Map();
   private config: Config;
   private server: McpServer;
+  private securitySchemes?: Record<string, SecurityScheme>;
+  private globalSecurity?: SecurityRequirement[];
 
-  constructor(server: McpServer, config: Config) {
+  constructor(
+    server: McpServer,
+    config: Config,
+    securitySchemes?: Record<string, SecurityScheme>,
+    globalSecurity?: SecurityRequirement[]
+  ) {
     this.server = server;
     this.config = config;
+    this.securitySchemes = securitySchemes;
+    this.globalSecurity = globalSecurity;
   }
 
   /**
@@ -98,17 +107,13 @@ export class ToolManager {
     try {
       logger.debug(`Executing tool: ${toolName}`, args);
 
-      // 提取 _baseUrl 参数
-      const { _baseUrl, ...restArgs } = args;
-
-      // 创建临时配置，优先使用参数中的 _baseUrl
-      const executionConfig = {
-        ...this.config,
-        baseUrl: typeof _baseUrl === 'string' ? _baseUrl : this.config.baseUrl,
-      };
-
-      const response = await executeRequest(tool.operation, restArgs, executionConfig);
-      const formattedResponse = formatResponse(response);
+      const formattedResponse = await executeOperation({
+        operation: tool.operation,
+        input: args,
+        config: this.config,
+        securitySchemes: this.securitySchemes,
+        globalSecurity: this.globalSecurity,
+      });
 
       return {
         content: [
@@ -125,55 +130,6 @@ export class ToolManager {
           : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
 
       logger.error(`Tool execution failed: ${toolName}`, error);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: errorMessage,
-          },
-        ],
-      };
-    }
-  }
-
-  /**
-   * 通过 operation 直接执行（用于 ondemand 模式）
-   */
-  async executeByOperation(
-    operation: OpenApiOperation,
-    args: Record<string, unknown>
-  ): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
-    try {
-      logger.debug(`Executing operation: ${operation.operationId || operation.path}`, args);
-
-      // 提取 _baseUrl 参数
-      const { _baseUrl, ...restArgs } = args;
-
-      // 创建临时配置，优先使用参数中的 _baseUrl
-      const executionConfig = {
-        ...this.config,
-        baseUrl: typeof _baseUrl === 'string' ? _baseUrl : this.config.baseUrl,
-      };
-
-      const response = await executeRequest(operation, restArgs, executionConfig);
-      const formattedResponse = formatResponse(response);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: formattedResponse,
-          },
-        ],
-      };
-    } catch (error) {
-      const errorMessage =
-        error instanceof ToolExecutionError
-          ? `Error: ${error.message}`
-          : `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
-
-      logger.error(`Operation execution failed: ${operation.operationId || operation.path}`, error);
 
       return {
         content: [

@@ -34,9 +34,13 @@
     "shenjingnan",
     "skycon",
     "swagger",
+    "toolong",
     "tsup",
     "unmarshal",
-    "zod"
+    "zod",
+    "dXNlcjpwYXNz",
+    "toolong",
+    "dXNlcjpwYXNz"
   ],
   "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
 }

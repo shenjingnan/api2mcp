@@ -4,6 +4,7 @@
 
 import type { Config } from '../config/types.js';
 import type { OpenApiOperation } from '../parser/types.js';
+import type { ResolvedAuthentication } from '../security/types.js';
 import { HttpError, ToolExecutionError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
 import { appendQueryString, buildRequest } from './request-builder.js';
@@ -24,7 +25,8 @@ export interface HttpResponse {
 export async function executeRequest(
   operation: OpenApiOperation,
   input: Record<string, unknown>,
-  config: Config
+  config: Config,
+  auth?: ResolvedAuthentication
 ): Promise<HttpResponse> {
   const baseUrl = config.baseUrl;
 
@@ -38,7 +40,13 @@ export async function executeRequest(
 
   try {
     // 构建请求
-    const built = buildRequest(operation, input, config.headers || {}, config.fixedParams || {});
+    const built = buildRequest(
+      operation,
+      input,
+      config.headers || {},
+      config.fixedParams || {},
+      auth
+    );
 
     // 构建完整 URL
     let url = `${baseUrl}${built.path}`;

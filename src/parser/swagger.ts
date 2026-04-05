@@ -13,6 +13,8 @@ import type {
   OpenApiSchema,
   ParameterLocation,
   ParsedOpenApiDoc,
+  SecurityRequirement,
+  SecurityScheme,
 } from './types.js';
 
 /**
@@ -125,6 +127,7 @@ function extractOperations(doc: OpenAPIV3.Document): OpenApiOperation[] {
             | OpenAPIV3.ReferenceObject
             | undefined
         ),
+        security: operation.security as SecurityRequirement[] | undefined,
         deprecated: operation.deprecated,
       };
 
@@ -180,6 +183,13 @@ export async function parseOpenApi(source: string): Promise<ParsedOpenApiDoc> {
         }
       : undefined;
 
+    // 提取安全方案
+    const securitySchemes =
+      (api.components?.securitySchemes as Record<string, SecurityScheme> | undefined) ?? undefined;
+
+    // 提取全局安全需求
+    const security = (api.security as SecurityRequirement[] | undefined) ?? undefined;
+
     logger.info(`Parsed ${operations.length} API operations`);
 
     return {
@@ -187,6 +197,8 @@ export async function parseOpenApi(source: string): Promise<ParsedOpenApiDoc> {
       info,
       servers,
       operations,
+      securitySchemes,
+      security,
       components,
     };
   } catch (error) {
