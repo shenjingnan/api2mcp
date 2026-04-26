@@ -1,0 +1,85 @@
+openapi: "3.0.0"
+info:
+  title: 太平洋网络 IP 归属地查询 API
+  version: "1.0"
+  description: |
+    太平洋网络提供的 IP 地址归属地查询服务，可查询 IP 对应的省份、城市、区县等地理位置信息。
+    本文档用于将此 API 转换为 MCP 工具使用。
+
+servers:
+  - url: https://whois.pconline.com.cn
+
+paths:
+  /ipJson.jsp:
+    get:
+      operationId: queryIpLocation
+      summary: IP 归属地查询
+      description: 查询指定 IP 地址的地理位置归属信息，包括省份、城市、区县、运营商等
+      tags:
+        - IP 查询
+      parameters:
+        - name: ip
+          in: query
+          required: false
+          description: 要查询的 IP 地址，留空则返回当前请求者的 IP 信息
+          schema:
+            type: string
+            example: "8.8.8.8"
+        - name: json
+          in: query
+          required: true
+          description: 固定为 true，返回 JSON 格式
+          schema:
+            type: string
+            enum:
+              - "true"
+            default: "true"
+      responses:
+        "200":
+          description: 成功返回 IP 归属地信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ip:
+                    type: string
+                    description: 查询的 IP 地址
+                  pro:
+                    type: string
+                    description: 省份名称
+                  proCode:
+                    type: string
+                    description: 省份行政编码
+                  city:
+                    type: string
+                    description: 城市名称
+                  cityCode:
+                    type: string
+                    description: 城市行政编码
+                  region:
+                    type: string
+                    description: 区县名称
+                  regionCode:
+                    type: string
+                    description: 区县行政编码
+                  addr:
+                    type: string
+                    description: 完整地址描述（包含省市区和运营商）
+                  regionNames:
+                    type: string
+                    description: 层级地区名称（逗号分隔）
+                  err:
+                    type: string
+                    description: 错误码，空字符串表示成功
+                example:
+                  ip: "8.8.8.8"
+                  pro: ""
+                  proCode: "999999"
+                  city: ""
+                  cityCode: "0"
+                  region: ""
+                  regionCode: "0"
+                  addr: " GOOGLE"
+                  regionNames: ""
+                  err: ""
