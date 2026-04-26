@@ -16,9 +16,5 @@
       "Bash(python3 *)",
       "Bash(cd *)"
     ]
-  },
-  "attribution": {
-    "commit": "🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: GLM-5.1 <noreply@bigmodel.cn>",
-    "pr": ""
   }
 }
