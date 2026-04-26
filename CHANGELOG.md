@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.0](https://github.com/shenjingnan/api2mcp/compare/v0.7.2...v0.8.0) (2026-04-26)
+
+### Features
+
+* **examples:** 添加 Gitee 镜像 MCP 配置示例并修复 JSON 格式 ([#66](https://github.com/shenjingnan/api2mcp/issues/66)) ([7f36ec0](https://github.com/shenjingnan/api2mcp/commit/7f36ec095140bb8cca91687ed303e2466930fcae))
+* **examples:** 添加太平洋网络 IP 归属地查询示例 ([#63](https://github.com/shenjingnan/api2mcp/issues/63)) ([2774e87](https://github.com/shenjingnan/api2mcp/commit/2774e87a804a0046e9b7d3ac44bbbf02d42bd1ac))
+* **plugin:** 添加 Claude Code 插件，支持 AI 辅助生成 OpenAPI 和 MCP 配置 ([#56](https://github.com/shenjingnan/api2mcp/issues/56)) ([649a59a](https://github.com/shenjingnan/api2mcp/commit/649a59a8b44c392d89f902544ce29b21ec800fc2))
+* **security:** 添加 OpenAPI Security Schemes 自动认证注入、代码清理和测试覆盖 ([#57](https://github.com/shenjingnan/api2mcp/issues/57)) ([9689d27](https://github.com/shenjingnan/api2mcp/commit/9689d27fb8a385b4cd5a16aca4a6255046c2f9f2))
+* **skill:** 添加 commit-push-pr 技能并清理 settings 配置 ([#64](https://github.com/shenjingnan/api2mcp/issues/64)) ([0d8c319](https://github.com/shenjingnan/api2mcp/commit/0d8c319b400ec608daf226c29f0c2331ddb1b1fd))
+
+### Bug Fixes
+
+* **deps:** 降级 swagger-parser 到 v11 修复远程 JSON OpenAPI 解析失败 ([#67](https://github.com/shenjingnan/api2mcp/issues/67)) ([c18ce97](https://github.com/shenjingnan/api2mcp/commit/c18ce970d09607117dadc278ed8471f348ea1027))
+
+### Code Refactoring
+
+* **examples:** 将示例配置文件从 api2mcp.json 重命名为 mcp.json ([#55](https://github.com/shenjingnan/api2mcp/issues/55)) ([cb7e1a1](https://github.com/shenjingnan/api2mcp/commit/cb7e1a1047ca2556268942da1f97eb56fb453953))
+
 ## [0.7.2](https://github.com/shenjingnan/api2mcp/compare/v0.7.1...v0.7.2) (2026-04-04)
 
 ### Code Refactoring
