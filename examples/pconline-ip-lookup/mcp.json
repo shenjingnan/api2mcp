@@ -1,0 +1,1 @@
+{"mcpServers": {"pconline-ip-lookup": {"command": "npx", "args": ["-y", "api2mcp", "--url", "https://raw.githubusercontent.com/shenjingnan/api2mcp/refs/heads/main/examples/pconline-ip-lookup/openapi.yaml", "--base-url", "https://whois.pconline.com.cn"]}}}
