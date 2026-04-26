@@ -2,6 +2,7 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "gitee",
     "adcode",
     "adname",
     "amap",
@@ -43,5 +44,11 @@
     "toolong",
     "dXNlcjpwYXNz"
   ],
-  "ignorePaths": ["node_modules", "dist", "coverage", "*.lock", "pnpm-lock.yaml"]
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.lock",
+    "pnpm-lock.yaml"
+  ]
 }
