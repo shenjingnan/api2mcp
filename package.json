@@ -54,7 +54,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@apidevtools/swagger-parser": "^12.1.0",
+    "@apidevtools/swagger-parser": "^11.0.1",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "commander": "^14.0.3",
     "zod": "^4.3.6"
