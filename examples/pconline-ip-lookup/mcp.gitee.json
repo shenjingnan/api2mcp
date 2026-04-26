@@ -6,7 +6,7 @@
         "-y",
         "api2mcp",
         "--url",
-        "https://raw.githubusercontent.com/shenjingnan/api2mcp/refs/heads/main/examples/pconline-ip-lookup/openapi.yaml",
+        "https://raw.giteeusercontent.com/shenjingnan/api2mcp/raw/main/examples/pconline-ip-lookup/openapi.yaml",
         "--base-url",
         "https://whois.pconline.com.cn"
       ]
